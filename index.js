@@ -26,5 +26,5 @@ if (__DEV__ && SHOW_STORYBOOK) {
   const { StorybookUIRoot } = require("./storybook")
   RootComponent = StorybookUIRoot
 }
-
 AppRegistry.registerComponent(APP_NAME, () => RootComponent)
+

@@ -5,7 +5,7 @@
  * will use once logged in.
  */
 import React from "react"
-import { NavigationContainer, NavigationContainerRef } from "@react-navigation/native"
+import { NavigationContainer, NavigationContainerRef} from "@react-navigation/native"
 
 import { createNativeStackNavigator } from "react-native-screens/native-stack"
 import { PrimaryNavigator } from "./primary-navigator"
@@ -38,7 +38,7 @@ const RootStack = () => {
     >
       <Stack.Screen
         name="primaryStack"
-        component={PrimaryNavigator}
+        component={PrimaryNavigator} 
         options={{
           headerShown: false,
         }}

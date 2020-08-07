@@ -1,6 +1,8 @@
 {
   "navigation": "react-navigation",
-  "generators": {},
+  "generators": {
+    "video": "ignite-video"
+  },
   "createdWith": "3.5.2",
   "boilerplate": "ignite-bowser",
   "boilerplateVersion": "5.2.1"
