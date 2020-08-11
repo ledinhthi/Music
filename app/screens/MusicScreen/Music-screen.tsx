@@ -2,7 +2,7 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect} from 
 import { observer } from "mobx-react-lite"
 import { ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
         TextInput, Image, TouchableOpacity, Keyboard,
-        TouchableWithoutFeedback, FlatList} from "react-native"
+        TouchableWithoutFeedback, FlatList, KeyboardAvoidingView} from "react-native"
 import { Screen } from "../../components"
 import { useNavigation, DrawerActions } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -11,7 +11,7 @@ import Icon from "react-native-vector-icons/Feather"
 import IconOcticons from "react-native-vector-icons/Octicons"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.purple,
+  backgroundColor: color.palette.black,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
@@ -173,9 +173,11 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   return (
     <Screen style={ROOT} preset="fixed">
       {/* <Text preset="header" tx="HomeScreen" /> */}
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      
       <View style = {styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
          {/* 15% for header  */}
+         <KeyboardAvoidingView  style= {{flex:1}} behavior="padding" keyboardVerticalOffset = {-1000}>
         <View style = {styles.header}>
             <View style = {{flexDirection: 'row'}}>
               <TouchableOpacity onPress = {onMenuButton}>
@@ -206,15 +208,19 @@ export const MusicScreen: Component = observer(function MusicScreen() {
               {"Playlists"}
            </Text>
            <FlatList
-           showsHorizontalScrollIndicator = {false}
-           style = {{marginTop: 10}}
-           horizontal = {true}
-           data ={DATA}
-          //  renderItem = {(data) => {
-          //       return (
-          //           <PlaylistItem props = {{data}}/>
-          //       )
-          //  }}()
+            showsHorizontalScrollIndicator = {false}
+            style = {{marginTop: 10}}
+            bounces = {false}
+            horizontal = {true}
+            data ={DATA}
+            keyExtractor = {(item) => {
+              return item.nameAlbum
+            }}
+            //  renderItem = {(data) => {
+            //       return (
+            //           <PlaylistItem props = {{data}}/>
+            //       )
+            //  }}()
           renderItem = {({item}) => (
               <PlaylistItem item = {item} navigation = {navigation}/>
           )}
@@ -227,18 +233,23 @@ export const MusicScreen: Component = observer(function MusicScreen() {
            </Text>
            <FlatList
            showsHorizontalScrollIndicator = {false}
-           style = {{marginTop: 10}}
+           style = {{marginTop: 10, paddingLeft : 10}}
+           bounces = {false}
            horizontal = {false}
            data ={SONG_DATA}
            renderItem = {({item}) => (
               <SongListItem item = {item} navigation = {navigation}/>
              )
            }
+           keyExtractor = {(item) => {
+            return item.nameSong
+          }}
            />
         </View>
+        </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </View>
-      </TouchableWithoutFeedback>
-    </Screen>
+      </Screen>
   )
 })
 
@@ -255,6 +266,8 @@ const styles = StyleSheet.create({
     },
     playlistArea : {
       flex : 2.5,
+      justifyContent: 'flex-start',
+      marginBottom: 10
     },
     songArea : {
       flex: 6,
@@ -286,6 +299,7 @@ const styles = StyleSheet.create({
        color: color.palette.offWhite,
        fontSize: 18,
        fontWeight: '800',
+      
     },
   
     playlistStyle: {

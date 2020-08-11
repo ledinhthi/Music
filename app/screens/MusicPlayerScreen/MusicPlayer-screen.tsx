@@ -7,18 +7,23 @@ import { Screen, Button } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
 import { color } from "../../theme"
-import Icon from "react-native-vector-icons/Feather"
+import IconFeather from "react-native-vector-icons/Feather"
 import IconIonicons from "react-native-vector-icons/Ionicons"
 import IconOcticons from "react-native-vector-icons/Octicons"
 import IconMaterial from "react-native-vector-icons/MaterialIcons"
+import IconAwesome from "react-native-vector-icons/FontAwesome"
+import IconEntypo from "react-native-vector-icons/Entypo"
 import * as ProgressBar from "react-native-progress"
+import { transform } from "@babel/core"
 
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.purple,
+  backgroundColor: color.palette.black,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
+
+
 
 export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen() {
   // Pull in one of our MST stores
@@ -35,36 +40,60 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   }
   const parent = useRef(null);
 
-  // create panResponsder
-  const pan = useRef(new Animated.ValueXY()).current
-  const panResponder = useRef(
+  // create panResponsder to use pan for life cycle
+  const pan = useRef(new Animated.Value(0)).current
+ 
+  let panOffsetX = useRef(0).current
+  let lastPosition = useRef(0).current
+  let newPosition = useRef(0).current
+  let lastMoveX = useRef(0).current
+  // button 
+  const [favoriteColor, setFavoriteColor] = useState(false);
+    pan.addListener((value) => {  
+        lastPosition = value.value
+    })
+  // const [panOffsetX, setPanOffSetX] = useRef(new Animated.vale);
+  const panResponder = useRef( 
     PanResponder.create({
-     
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (event, gesture) => {
-        console.log(`onPanResponderGrant event: ${event} + gesture : ${gesture}`)
-        // pan.setOffset({
-        //   x: pan.x,
-        //   y: pan.y
-        // });
+        pan.setOffset(lastPosition)
+        pan.setValue(0)
+        console.log(`event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
+        lastPosition + ${lastPosition} `)
       },
-      onPanResponderMove: Animated.event(
-        [
-          null,
-          { dx: pan.x, dy: pan.y }
-        ]
-       
-      ),
+    
+      onPanResponderMove: Animated.event([
+        null,
+        {dx: pan}
+      ]),
       onPanResponderRelease: (event, gesture) => {    
-        console.log(`onRelease event: + ${event} + gesture : ${gesture}`)
-        Animated.spring(
-          pan, // Auto-multiplexed
-          { toValue: { x: 0, y: 0 } } // Back to zero
-        ).start();
+        console.log(`onPanResponderRelease event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
+        + pan + ${pan} + x0 : ${gesture.x0} + moveX + ${gesture.moveX} + newPosition: ${newPosition}`)
+        pan.flattenOffset();
       },
-      
+      // onPanResponderRelease: Animated.event([
+      //   null,
+      //   {dx: pan},
+      // ]),
     })
   ).current;
-
+  // useEffect(()=> {
+  //   pan.addListener((data)=> {
+  //     console.log(`pan + ${data.value}`)
+  //     if (data.value >= 370) {
+  //       // panResponder.panHandlers.set
+  //       pan.setValue(370);
+        
+  //     }
+  //     else if (data.value <= 0) {
+  //       pan.setValue(0); 
+  //     }
+  //   })
+  // })
   return (
     
     <Screen style={ROOT} preset="fixed">
@@ -124,23 +153,40 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 {/* Play,Pause,Prev,next button */}
                 <View style = {{flex: 3, flexDirection: 'row', marginTop: 30,
                 alignItems: 'center'}}>
-                    <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
-                    <IconIonicons name = "play" size = {65} color = {color.palette.offWhite}/>
-                    <IconMaterial name = "skip-next" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
+                    
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On Skip previous`)
+                    }}>  
+                      <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On play`)
+                    }}>  
+                      <IconIonicons name = "play" size = {60} color = {color.palette.offWhite}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On skip next`)
+                    }}>    
+                      <IconMaterial name = "skip-next" size = {60} color = {color.palette.offWhite} 
+                      style = {{marginLeft: 50, marginRight: 50}}/>
+                    </TouchableOpacity>  
                 </View>
                 {/* Progressbar */}
                 <View style = {{flex: 2, flexDirection:'column', justifyContent: 'center'}}>
                     {/* Progresss */}
                     <View style = {{ height: 3 , backgroundColor: 'white', margin: 20}}  >
-                      {/* <Animated.View  style={{
-                        transform: [{ translateX: pan.x, translateY: pan.y }]
-                      }}
-                       {...panResponder.panHandlers} > */}
-                        <Animated.View   {...panResponder.panHandlers} style = {[pan.getLayout(), {width: 10, height: 10, position: 'absolute', top: -4, zIndex: 2, borderRadius: 5, backgroundColor: 'white'}
-                        ]}
-                   />
+                    <Animated.View  style = {[{flex: 1}, {transform: [{translateX: pan}]}]}
+                       {...panResponder.panHandlers} 
+                    > 
+                  
+                    <View style = {{width: 10, height: 10, position: 'absolute', top: -4, zIndex: 2,
+                      borderRadius: 5, backgroundColor: 'white'}}>
+                  
+                    </View>
+                    </Animated.View>
                       {/* </Animated.View> */}
                     </View>
+                
                     {/* Information on progress */}
                     <View>
 
@@ -148,10 +194,28 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 </View>
                 {/* Other features */}
                 <View style = {{flex: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
-                    <IconIonicons name = "repeat-outline" size = {30} color = {color.palette.offWhite} />
-                    <IconIonicons name = "play" size = {30} color = {color.palette.offWhite} />
-                    <IconMaterial name = "skip-next" size = {30} color = {color.palette.offWhite} />
-                    <IconMaterial name = "skip-next" size = {30} color = {color.palette.offWhite} />
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On Repeat`)
+                    }}>  
+                    <IconIonicons name = "repeat-outline" size = {35} color = {color.palette.offWhite} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On Share Button`)
+                    }}> 
+                    <IconFeather name = "download" size = {30} color = {color.palette.offWhite} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        console.log(`On download`)
+                    }}> 
+                    <IconEntypo name = "share" size = {30} color = {color.palette.offWhite} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress = {() => {
+                        setFavoriteColor(!favoriteColor)
+                     
+                        console.log(`favoriteColor +${favoriteColor}`)
+                      }}> 
+                      <IconAwesome name = "heart" size = {30} color = {favoriteColor ? color.palette.orange : color.palette.offWhite} />
+                    </TouchableOpacity>
                 </View>
               </View>
             </View>

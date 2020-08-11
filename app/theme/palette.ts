@@ -9,5 +9,5 @@ export const palette = {
   lighterGrey: "#CDD4DA",
   angry: "#dd3333",
   purple: "#330033",
-  bluePurple: "#FFFFFF"
+  bluePurple: "blue"
 }

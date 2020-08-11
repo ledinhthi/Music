@@ -12,7 +12,7 @@ import IconIonicons from "react-native-vector-icons/Ionicons"
 import IconOcticons from "react-native-vector-icons/Octicons"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.purple,
+  backgroundColor: color.palette.black,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
@@ -153,7 +153,7 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
                         style = {{position: 'absolute', top: 14, left: 7}}
                         >
                    </IconOcticons>
-                  <TextInput inlineImageLeft='search_icon' style = {styles.textInputStyle}
+                  <TextInput  style = {styles.textInputStyle}
                   placeholder = {"Search Here!!"}
                   placeholderTextColor = {color.palette.white70Percent}>                  
                   </TextInput>
@@ -173,7 +173,6 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
               <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.white, borderTopLeftRadius: 50}}>
               <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.purple, borderTopLeftRadius: 70}}>
                 <FlatList
-                  // stickyHeaderIndices = {false}
                   showsVerticalScrollIndicator = {false}
                   style = {{marginTop: 15, paddingLeft: 30}}
                   bounces = {false}
@@ -183,6 +182,9 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
                       <SongListItem item = {item} navigation = {navigation}/>
                     )
                   }
+                  keyExtractor = {(item) => {
+                    return item.nameSong
+                  }}
                 />
               </View>
             </View>
@@ -219,6 +221,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   textInputStyle: {
+    height: 30,
     paddingLeft: 35,
     width: widthScreen,
     backgroundColor: color.palette.white,
