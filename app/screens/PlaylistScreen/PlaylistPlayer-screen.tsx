@@ -7,7 +7,7 @@ import { Screen, Text } from "../../components"
 import { color } from "../../theme"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black,
+  backgroundColor: color.palette.black12DP,
 }
 
 export const PlaylistScreen: Component = observer(function PlaylistScreen() {

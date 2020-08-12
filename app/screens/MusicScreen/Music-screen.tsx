@@ -11,7 +11,7 @@ import Icon from "react-native-vector-icons/Feather"
 import IconOcticons from "react-native-vector-icons/Octicons"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black,
+  backgroundColor: color.palette.black12DP,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
@@ -283,23 +283,23 @@ const styles = StyleSheet.create({
       width: 40, 
       height: 40, 
       borderRadius: 20,
-      backgroundColor: color.palette.white, 
+      backgroundColor: color.palette.gray16DP, 
       alignItems: 'center', 
       justifyContent: "center"
     },
     textInputStyle: {
+      height: 30,
       paddingLeft: 35,
       width: widthScreen,
       backgroundColor: color.palette.white,
       borderTopLeftRadius: 20,
       borderBottomLeftRadius: 20,
-      color: color.palette.offWhite
+      color: color.palette.gray16DP
     },
     textStyle : {
        color: color.palette.offWhite,
        fontSize: 18,
        fontWeight: '800',
-      
     },
   
     playlistStyle: {

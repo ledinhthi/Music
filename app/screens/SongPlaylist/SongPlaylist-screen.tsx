@@ -2,7 +2,7 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect} from 
 import { observer } from "mobx-react-lite"
 import { ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
   TextInput, Image, TouchableOpacity, Keyboard,
-  TouchableWithoutFeedback, FlatList} from "react-native"
+  TouchableWithoutFeedback, FlatList, StatusBar, PanResponder, Animated} from "react-native"
 import { Screen, Button } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -10,9 +10,11 @@ import { color } from "../../theme"
 import Icon from "react-native-vector-icons/Feather"
 import IconIonicons from "react-native-vector-icons/Ionicons"
 import IconOcticons from "react-native-vector-icons/Octicons"
+import { MusicPlayerScreen } from "../MusicPlayerScreen/MusicPlayer-screen"
+import { NONE } from "apisauce"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black,
+  backgroundColor: color.palette.black12DP,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
@@ -79,7 +81,8 @@ const SongListItem = ({item, navigation}) => {
           author: item.nameAuthor,
           duration: item.duration
        }
-        navigation.navigate("MusicPlayer", imageInfo)
+       navigation.push("MusicPlayer", imageInfo)
+        // navigation.navigate("MusicPlayer", imageInfo)
       // navigation.goBack()
     }}>
     <View style = {{flex: 1, flexDirection: 'row', width: widthScreen, height: 60}}>
@@ -116,10 +119,59 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
    // Create state
    const [isChoseAlbum, setIsChoseAlbum] = useState(false);
    const [urlChoseAlbum, setUrlChoseAlbum] = useState("");
-   // useEffect(() => {
-   //   // get url image from chose Album
-   //   console.log("useEffect")
-   // })
+    // slider
+    const slider = useRef(new Animated.Value(0)).current
+  
+    let panLastPosition = useRef(0).current
+    let sliderLastPosition = useRef(0).current
+    let newPosition = useRef(0).current
+    
+    // button 
+    const [favoriteColor, setFavoriteColor] = useState(false);
+     slider.addListener((valueChanged) => {
+         console.log(`Slider position :${valueChanged.value}`)
+         sliderLastPosition = valueChanged.value
+      })
+     
+    const sliderResponder = useRef( 
+      PanResponder.create({
+        onStartShouldSetPanResponder: (evt, gestureState) => false,
+        onStartShouldSetPanResponderCapture: (evt, gestureState) => {
+          console.log("onStart")
+          const { dx, dy } = gestureState
+          return (dx > 2 || dx < -2 || dy > 2 || dy < -2)
+        },
+        onMoveShouldSetPanResponder: (evt, gestureState) => {
+          return !(gestureState.dx === 0 && gestureState.dy === 0) 
+        },
+        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onPanResponderGrant: (event, gesture) => {
+          // Progress bar
+          console.log("OnTouch grant")
+          slider.setOffset(sliderLastPosition)
+          slider.setValue(0)
+        
+       
+        },
+      
+        onPanResponderMove: Animated.event([
+          null,
+          {dy: slider}
+        ]),
+        onPanResponderRelease: (event, gesture) => {    
+          slider.flattenOffset();
+          // Release slider pan
+          // slider.flattenOffset();
+        },
+        onPanResponderTerminationRequest: (evt, gestureState) =>
+        true,
+        onPanResponderTerminate: (evt, gestureState) => true,
+        // onPanResponderRelease: Animated.event([
+        //   null,
+        //   {dx: pan},
+        // ]),
+      })
+    ).current;
    // Pull in one of our MST stores
    const rootStore = useStores();
    // console.log(`Store + ${rootStore}`)
@@ -129,6 +181,7 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
      console.log(`screenWidth + ${widthScreen} + heightScreen + ${heightScreen}`)
    })
    function onBackButton() {
+
       navigation.goBack()
    }
    return (
@@ -147,16 +200,17 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
                 </View>
               </TouchableOpacity>
                 <View style = {{flex : 1 ,flexDirection: "row", marginLeft: 100, alignItems: 'center'}}>
+                <TextInput  style = {styles.textInputStyle}
+                    placeholder = {"Search Here!!"}
+                    placeholderTextColor = {color.palette.white70Percent}>                  
+                  </TextInput>
                     <IconOcticons size = {20}
                         color = "#FFFFFF"
                         name = "search"
                         style = {{position: 'absolute', top: 14, left: 7}}
                         >
                    </IconOcticons>
-                  <TextInput  style = {styles.textInputStyle}
-                  placeholder = {"Search Here!!"}
-                  placeholderTextColor = {color.palette.white70Percent}>                  
-                  </TextInput>
+                   
                 </View>  
             </View>
         </View>  
@@ -171,7 +225,7 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
                 </Text>
              </View>
               <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.white, borderTopLeftRadius: 50}}>
-              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.purple, borderTopLeftRadius: 70}}>
+              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.gray16DP, borderTopLeftRadius: 70}}>
                 <FlatList
                   showsVerticalScrollIndicator = {false}
                   style = {{marginTop: 15, paddingLeft: 30}}
@@ -189,8 +243,24 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
               </View>
             </View>
         </View>
+         {/* <View style = {{width: widthScreen, height: heightScreen}}>
+          <Animated.View style = {[{flex: 1}, {transform: [{translateY: slider}]}]}
+           {...sliderResponder.panHandlers}>
+          <MusicPlayerScreen >
+
+          </MusicPlayerScreen>
+          </Animated.View>     
+        </View> */}
         </View>
-        </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+        <View style = {{width: widthScreen, height: Platform.OS === "ios" ? heightScreen : heightScreen - 50,  position: 'absolute'}}>
+          <Animated.View style = {[{...StyleSheet.absoluteFillObject}, {transform: [{translateY: slider}]}]}
+           {...sliderResponder.panHandlers}
+          >
+          <MusicPlayerScreen >
+          </MusicPlayerScreen>
+          </Animated.View>     
+        </View>
      </Screen>
    )
 })
@@ -216,7 +286,7 @@ const styles = StyleSheet.create({
     width: 40, 
     height: 40, 
     borderRadius: 20,
-    backgroundColor: color.palette.white, 
+    backgroundColor: color.palette.gray16DP, 
     alignItems: 'center', 
     justifyContent: "center"
   },
@@ -224,10 +294,10 @@ const styles = StyleSheet.create({
     height: 30,
     paddingLeft: 35,
     width: widthScreen,
-    backgroundColor: color.palette.white,
+    backgroundColor: color.palette.gray16DP,
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
-    color: color.palette.offWhite
+    color: color.palette.gray16DP
   },
   textStyle : {
      color: color.palette.offWhite,

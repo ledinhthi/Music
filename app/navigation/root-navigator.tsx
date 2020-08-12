@@ -9,6 +9,7 @@ import { NavigationContainer, NavigationContainerRef} from "@react-navigation/na
 
 import { createNativeStackNavigator } from "react-native-screens/native-stack"
 import { PrimaryNavigator } from "./primary-navigator"
+// import { MusicPlayerScreen } from "../screens"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -32,7 +33,6 @@ const RootStack = () => {
       screenOptions={{
         headerShown: false,
         gestureEnabled: true,
-
         stackPresentation: "modal",
       }}
     >

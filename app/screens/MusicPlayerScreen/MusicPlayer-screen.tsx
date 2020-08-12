@@ -2,7 +2,7 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect} from 
 import { observer } from "mobx-react-lite"
 import { Animated, ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
   TextInput, Image, TouchableOpacity, Keyboard,
-  TouchableWithoutFeedback, FlatList, PanResponder} from "react-native"
+  TouchableWithoutFeedback, FlatList, PanResponder, Slider} from "react-native"
 import { Screen, Button } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -18,14 +18,14 @@ import { transform } from "@babel/core"
 
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black,
+  backgroundColor: color.palette.black12DP,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
 
 
 
-export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen() {
+export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(props) {
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
@@ -42,15 +42,20 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
 
   // create panResponsder to use pan for life cycle
   const pan = useRef(new Animated.Value(0)).current
- 
-  let panOffsetX = useRef(0).current
-  let lastPosition = useRef(0).current
+  const slider = useRef(new Animated.Value(0)).current
+  
+  let panLastPosition = useRef(0).current
+  let sliderLastPosition = useRef(0).current
   let newPosition = useRef(0).current
-  let lastMoveX = useRef(0).current
+  
   // button 
   const [favoriteColor, setFavoriteColor] = useState(false);
+   slider.addListener((valueChanged) => {
+       console.log(`Slider position :${valueChanged.value}`)
+       sliderLastPosition = valueChanged.value
+    })
     pan.addListener((value) => {  
-        lastPosition = value.value
+        panLastPosition = value.value
     })
   // const [panOffsetX, setPanOffSetX] = useRef(new Animated.vale);
   const panResponder = useRef( 
@@ -60,10 +65,12 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (event, gesture) => {
-        pan.setOffset(lastPosition)
+        // Progress bar
+        pan.setOffset(panLastPosition)
         pan.setValue(0)
         console.log(`event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
-        lastPosition + ${lastPosition} `)
+        panLastPosition + ${panLastPosition} `)
+     
       },
     
       onPanResponderMove: Animated.event([
@@ -74,6 +81,8 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
         console.log(`onPanResponderRelease event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
         + pan + ${pan} + x0 : ${gesture.x0} + moveX + ${gesture.moveX} + newPosition: ${newPosition}`)
         pan.flattenOffset();
+        // Release slider pan
+        // slider.flattenOffset();
       },
       // onPanResponderRelease: Animated.event([
       //   null,
@@ -81,27 +90,45 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
       // ]),
     })
   ).current;
-  // useEffect(()=> {
-  //   pan.addListener((data)=> {
-  //     console.log(`pan + ${data.value}`)
-  //     if (data.value >= 370) {
-  //       // panResponder.panHandlers.set
-  //       pan.setValue(370);
+    // slider
+    const sliderResponder = useRef( 
+      PanResponder.create({
+        onStartShouldSetPanResponder: (evt, gestureState) => true,
+        onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onMoveShouldSetPanResponder: (evt, gestureState) => true,
+        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+        onPanResponderGrant: (event, gesture) => {
+          // Progress bar
+          slider.setOffset(sliderLastPosition)
+          slider.setValue(0)
         
-  //     }
-  //     else if (data.value <= 0) {
-  //       pan.setValue(0); 
-  //     }
-  //   })
-  // })
+       
+        },
+      
+        onPanResponderMove: Animated.event([
+          null,
+          {dy: slider}
+        ]),
+        onPanResponderRelease: (event, gesture) => {    
+          slider.flattenOffset();
+          // Release slider pan
+          // slider.flattenOffset();
+        },
+        // onPanResponderRelease: Animated.event([
+        //   null,
+        //   {dx: pan},
+        // ]),
+      })
+    ).current;
+  
   return (
-    
     <Screen style={ROOT} preset="fixed">
-      <View style = {styles.container}> 
             {/* Image backgorund */}
-          {/* <ImageBackground>
-
-          </ImageBackground> */}
+          <ImageBackground style = {styles.container} source = {{uri: "https://m.media-amazon.com/images/M/     MV5BMGU5YTRjMTUtZDU4Mi00NjFlLWExYTAtMjVkN2JmOTE1Y2Q2XkEyXkFqcGdeQXVyNjE0ODc0MDc@._V1_UY268_CR43,0,182,268_AL_.jpg"}}
+          >
+          {/* <Animated.View style = {[{flex: 1}, {transform: [{translateY: slider}]}]}
+                       {...sliderResponder.panHandlers}> */}
+          <View style = {{flex: 1}}>
           <View style = {[styles.header, {marginLeft: 10}]}>
           <TouchableOpacity onPress = {onPressToSmallScreen}>
                 <View style = {styles.menuButton}>
@@ -110,7 +137,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                       name = "ios-chevron-down">
                     </IconIonicons>
                 </View>
-              </TouchableOpacity>
+          </TouchableOpacity>
           </View>
           <View style = {styles.playerArea}>
             {/*  Content */}
@@ -126,7 +153,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
             </View>
             {/* InformAtion bar */}
             <View style = {{flex: 1.5}}>
-              <View style = {{flex: 1, margin: 10, backgroundColor: color.palette.purple, borderRadius: 20}}>
+              <View style = {{flex: 1, margin: 10, backgroundColor: color.palette.gray1DP, borderRadius: 20}}>
                   <View  style = {{flex: 1, flexDirection: 'row', marginLeft: 15, marginRight: 15, 
                   marginTop: 20, marginBottom: 20, alignItems: 'center'}}>
                     {/* Image */}
@@ -149,7 +176,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
             </View >
             {/* control bar */}
             <View style = {{flex: 4}}>
-              <View style = {{flex: 1, backgroundColor: color.palette.purple,  marginTop: 30, borderTopLeftRadius: 30, borderTopRightRadius: 30}}>
+              <View style = {{flex: 1, backgroundColor: color.palette.gray1DP,  marginTop: 30, borderTopLeftRadius: 30, borderTopRightRadius: 30}}>
                 {/* Play,Pause,Prev,next button */}
                 <View style = {{flex: 3, flexDirection: 'row', marginTop: 30,
                 alignItems: 'center'}}>
@@ -194,11 +221,11 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 </View>
                 {/* Other features */}
                 <View style = {{flex: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
-                    <TouchableOpacity onPress = {() => {
+                    <TouchableWithoutFeedback onPress = {() => {
                         console.log(`On Repeat`)
                     }}>  
                     <IconIonicons name = "repeat-outline" size = {35} color = {color.palette.offWhite} />
-                    </TouchableOpacity>
+                    </TouchableWithoutFeedback>
                     <TouchableOpacity onPress = {() => {
                         console.log(`On Share Button`)
                     }}> 
@@ -220,8 +247,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
               </View>
             </View>
           </View>
-
-      </View>
+                    
+        </View>
+        {/* </Animated.View>      */}
+      </ImageBackground>
     </Screen>
   )
 })
@@ -246,7 +275,7 @@ const styles = StyleSheet.create({
     width: 40, 
     height: 40, 
     borderRadius: 20,
-    backgroundColor: color.palette.white, 
+    backgroundColor: color.palette.gray16DP, 
     alignItems: 'center', 
     justifyContent: "center"
   },

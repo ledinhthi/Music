@@ -153,13 +153,17 @@ export function PrimaryNavigator() {
     <DrawerStack.Navigator
         screenOptions={{
          gestureEnabled: true,
-         swipeEnabled: false
+         swipeEnabled: false,
           // header : {{visible: false}}
       }}
+      
       drawerContentOptions = {{
         style: {
           flex: 1,
-          backgroundColor: color.palette.bluePurple
+          backgroundColor: color.palette.gray4DP,
+        },
+        labelStyle: {
+          color: color.palette.offWhite
         }
       }}
       initialRouteName = "Music"
