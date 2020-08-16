@@ -1,7 +1,8 @@
 import { onSnapshot } from "mobx-state-tree"
-import { RootStoreModel, RootStore } from "./root-store"
+import { RootStoreModel, RootStore, State } from "./root-store"
 import { Environment } from "../environment"
 import * as storage from "../../utils/storage"
+
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -34,7 +35,25 @@ export async function setupRootStore() {
     // load data from storage
     data = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
     console.log(`Data: ${data}`)
-    rootStore = RootStoreModel.create()
+    
+    rootStore = RootStoreModel.create({
+      Playlist: {
+        AlbumSongPlaylist: {
+          NameAlbumSong: "Vk iu",
+          AlbumSong: [
+            {
+              NameSong: "123",
+              NameAuthor: "ThiHa",
+              isPlaying: false
+            }
+          ]
+
+        },
+        AlbumVideoPlaylist: {
+          NameAlbumVideo: "Vk iu video"
+        }
+      }
+    })
   } catch (e) {
     // if there's any problems loading, then let's at least fallback to an empty state
     // instead of crashing.

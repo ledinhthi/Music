@@ -12,9 +12,11 @@
 import "./i18n"
 import "./utils/ignore-warnings"
 import React, { useState, useEffect, useRef, FunctionComponent as Component } from "react"
+import {View, Dimensions, StyleSheet, PanResponder, Animated, StatusBar, Platform} from "react-native"
 import { NavigationContainerRef } from "@react-navigation/native"
-import { SafeAreaProvider, initialWindowSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaProvider, initialWindowSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
 import * as storage from "./utils/storage"
+import {Player} from "./navigation/primary-navigator"
 import {
   useBackButtonHandler,
   RootNavigator,
@@ -23,11 +25,14 @@ import {
   useNavigationPersistence,
 } from "./navigation"
 import { RootStore, RootStoreProvider, setupRootStore } from "./models"
+import {widthDeviceScreen, heightDeviceScreen} from  "./utils/common/definition"
 
 // This puts screens in a native ViewController or Activity. If you want fully native
 // stack navigation, use `createNativeStackNavigator` in place of `createStackNavigator`:
 // https://github.com/kmagiera/react-native-screens#using-native-stack-navigator
 import { enableScreens } from "react-native-screens"
+import { transform } from "@babel/core"
+import { translate } from "./i18n"
 enableScreens()
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
@@ -35,6 +40,7 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 /**
  * This is the root component of our app.
  */
+
 const App: Component<{}> = () => {
   const navigationRef = useRef<NavigationContainerRef>()
   const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
@@ -45,12 +51,97 @@ const App: Component<{}> = () => {
     storage,
     NAVIGATION_PERSISTENCE_KEY,
   )
+  // Use panresponder for Player screen
+  const pan = useRef(new Animated.Value(0)).current;
+  let   isMovedFromTop = useRef(false).current;
+  let   lastPosition = useRef(0).current;
+  pan.addListener((panValue) => {
+    lastPosition = panValue.value;
+    console.log(`panValue.value : ${lastPosition} `)
+  })
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        console.log(`onMoveShouldSetPanResponder gestureState.dy ${gestureState.dy} + gestureState.moveY ${gestureState.moveY}`)
+        return  true
+      },
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) =>
+        false,
 
+      onPanResponderGrant: (evt, gestureState) => {
+        console.log(`PanResponderGrant ${gestureState.dy} + lastposition ${lastPosition}`)
+        if (lastPosition == 0) {
+           isMovedFromTop = true;
+        }
+        else if (lastPosition <= heightDeviceScreen - 60) {
+           isMovedFromTop = false;
+        }
+        pan.setOffset(lastPosition)
+        pan.setValue(0)
+        // The gesture has started. Show visual feedback so the user knows
+        // what is happening!
+        // gestureState.d{x,y} will be set to zero now
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        console.log(`moveY : ${gestureState.moveY} dy: ${gestureState.dy} y0: ${gestureState.y0}`)
+        // if (gestureState.moveY < 300) {
+        //   return false;
+        // }
+        // else if ( gestureState.moveY > heightDeviceScreen - 60) {
+        //   return false;
+        // }
+        // else {
+         
+        // }
+        if (isMovedFromTop && (gestureState.dy < 0)) {
+            return false;
+        }
+        else if ((!isMovedFromTop) && (gestureState.dy > 0)) {
+            return false;
+        }
+        pan.setValue(gestureState.dy)
+       
+      },
+
+      onPanResponderTerminationRequest: (evt, gestureState) =>
+        true,
+      onPanResponderRelease: (evt, gestureState) => {
+        // The user has released all touches while this view is the
+        // responder. This typically means a gesture has succeeded
+        console.log(`onReleased GestureState.dy ${gestureState.dy} + GestureState.moveY + ${gestureState.moveY}`)
+        if (isMovedFromTop) {
+          //  bottomPosition = heightDeviceScreen - 60;
+          lastPosition = heightDeviceScreen - 60
+          pan.setValue(lastPosition)
+        }
+        else {
+          lastPosition = 0
+          pan.setOffset(lastPosition)
+          pan.setValue(lastPosition)
+        }
+        
+        pan.flattenOffset()
+      },
+      onPanResponderTerminate: (evt, gestureEvent)  => {
+         true
+      }
+    })
+  ).current
   // Kick off initial async loading actions, like loading fonts and RootStore
   useEffect(() => {
     ;(async () => {
       setupRootStore().then(setRootStore)
     })()
+    const width = Dimensions.get("window").width
+    const height = Dimensions.get("window").height
+    const widthScreen = Dimensions.get("screen").width
+    const heightScreen = Dimensions.get("screen").height
+    console.log(`widthScreenWindow : ${width} + heightScreenWindow : ${height} + widthScreenScreen : ${widthScreen} + heightScreenScreen : ${heightScreen}`)
+    return () => {
+       console.log("Unmounted screen")
+       pan.removeAllListeners();
+    }
   }, [])
 
   // Before we show the app, we have to wait for our state to be ready.
@@ -62,13 +153,21 @@ const App: Component<{}> = () => {
   // otherwise, we're ready to render the app
   return (
     <RootStoreProvider value={rootStore}>
-      <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets}>
+      <View style = {{flex: 1}}>
+      <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets} >
         <RootNavigator
           ref={navigationRef}
           initialState={initialNavigationState}
           onStateChange={onNavigationStateChange}
         />
       </SafeAreaProvider>
+      </View>
+      <Animated.View style = {[{flex: 1, ...StyleSheet.absoluteFillObject}, {transform: [{translateY: pan}]}]}
+       {...panResponder.panHandlers}>
+        <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets}>
+            <Player/>      
+        </SafeAreaProvider>
+      </Animated.View>
     </RootStoreProvider>
   )
 }

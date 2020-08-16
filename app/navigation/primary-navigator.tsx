@@ -18,7 +18,9 @@ import IconFontAweSome from 'react-native-vector-icons/FontAwesome';
 import IconIoniCons from 'react-native-vector-icons/Ionicons'
 import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
-import {color} from "../theme/color"
+import {color} from "../theme"
+import { NavigationContainer } from "@react-navigation/native"
+import {Platform, Text} from 'react-native'
 
 // settings  inicon   md-settings-sharp 
 
@@ -81,6 +83,23 @@ const PlaylistsStack = createMaterialTopTabNavigator<PlaylistsParamList>();
 const AlbumSongStack  = createNativeStackNavigator<AlbumSongParamList>();
 const AlbumVideoStack = createNativeStackNavigator<AlbumVideoParamList>();
 const VideoStack  = createNativeStackNavigator<VideoParamList>();
+const ContainerPlayerStack = createNativeStackNavigator();
+
+export function Player() {
+  return (
+      <NavigationContainer>
+      <ContainerPlayerStack.Navigator
+       screenOptions = {{
+        headerShown : false,
+        stackPresentation: 'modal'
+      }}
+    >
+      <ContainerPlayerStack.Screen name= "player" component = {MusicPlayerScreen}/>
+    </ContainerPlayerStack.Navigator>
+    </NavigationContainer>
+ 
+  )
+}
 // Albumsong
 function AlbumSong () {
   return (
@@ -91,7 +110,6 @@ function AlbumSong () {
     >
       <AlbumSongStack.Screen name = "AlbumSongScreen" component = {AlbumSongScreen}/>
       <AlbumSongStack.Screen name = "SongPlaylist" component = {SongPlaylistScreen}/>
-      <AlbumSongStack.Screen name = "MusicPlayer" component = {MusicPlayerScreen}/>
     </AlbumSongStack.Navigator>
   )
 }
@@ -99,7 +117,7 @@ function AlbumSong () {
 function AlbumVideo () {
   return (
     <AlbumVideoStack.Navigator
-    screenOptions = {{
+     screenOptions = {{
       headerShown : false
     }}
     >
@@ -120,7 +138,6 @@ function Music () {
      >
        <MusicStack.Screen 
        name = "Music" component = {MusicScreen} />
-       <MusicStack.Screen name = "MusicPlayer" component = {MusicPlayerScreen} />
        <MusicStack.Screen name = "SongPlaylist" component = {SongPlaylistScreen} />
      </MusicStack.Navigator>
   )
@@ -129,9 +146,44 @@ function Music () {
 function Playlists () {
   return (
      <PlaylistsStack.Navigator
+        tabBarOptions = {{
+          tabStyle: {
+            flex: 1,
+            paddingTop: Platform.select({
+              ios : 40,
+              android: 0
+            }),
+            backgroundColor: color.palette.gray16DP,
+          },
+          // pressColor: color.palette.bluePurple,
+          labelStyle: {
+            color: color.palette.offWhite,
+          },  
+        }}  
     >
-       <PlaylistsStack.Screen name = "MusicPlaylist" component = {AlbumSong} />
-       <PlaylistsStack.Screen name = "VideoPlaylist" component = {AlbumVideo} />
+       <PlaylistsStack.Screen 
+        options = {{
+          tabBarLabel: ({focused}) => {
+            return (
+              <Text style = {{ color: focused ? color.palette.heavyBlue : color.palette.offWhite}}>
+                MUSICPLAYLIST
+               </Text>
+            )
+          }
+        }}
+        name = "MusicPlaylist" component = {AlbumSong} />
+       <PlaylistsStack.Screen 
+         options = {{
+          tabBarLabel: ({focused}) => {
+            return (
+              <Text style = {{color: focused ? color.palette.heavyBlue : color.palette.offWhite}}>
+                VIDEOPLAYLIST
+               </Text>
+            )
+          }  
+        }
+      }
+       name = "VideoPlaylist" component = {AlbumVideo} />
      </PlaylistsStack.Navigator>
   )
 }
@@ -147,16 +199,16 @@ function Video () {
     </VideoStack.Navigator>
   )
 }
+
 // Export Function which contain all
 export function PrimaryNavigator() {
   return (
     <DrawerStack.Navigator
         screenOptions={{
          gestureEnabled: true,
-         swipeEnabled: false,
+         swipeEnabled: true,
           // header : {{visible: false}}
       }}
-      
       drawerContentOptions = {{
         style: {
           flex: 1,

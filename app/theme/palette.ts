@@ -1,4 +1,5 @@
 export const palette = {
+  transparent: "transparent",
   black: "#1d1d1d",
   white: "#ffffff07",
   white70Percent: "#ffffff70",
@@ -15,5 +16,7 @@ export const palette = {
   gray4DP: "#121212",
   gray24DP: "#242424",
   gray08DP: "#080808",
-  gray16DP: "#161616"
+  gray16DP: "#161616",
+  bluePowder: 'powderblue',
+  heavyBlue: "#00BFFF"
 }

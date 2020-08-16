@@ -2,7 +2,7 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect} from 
 import { observer } from "mobx-react-lite"
 import { Animated, ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
   TextInput, Image, TouchableOpacity, Keyboard,
-  TouchableWithoutFeedback, FlatList, PanResponder, Slider} from "react-native"
+  TouchableWithoutFeedback, FlatList, PanResponder, Slider, Share, Alert} from "react-native"
 import { Screen, Button } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -15,21 +15,27 @@ import IconAwesome from "react-native-vector-icons/FontAwesome"
 import IconEntypo from "react-native-vector-icons/Entypo"
 import * as ProgressBar from "react-native-progress"
 import { transform } from "@babel/core"
-
+import { MiniPlayer } from "./MiniPlayer"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
+
+  borderTopLeftRadius: 15,
+  borderTopRightRadius: 15,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
-
-
+interface Props {
+  name: String,
+  Iconstyles: any,
+  playingState: boolean
+}
 
 export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(props) {
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
-  // const rootStore = useStores()
+  const rootStore = useStores()
   // Pull in navigation via hook
   const navigation = useNavigation();
   
@@ -38,41 +44,60 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
      navigation.goBack()
     //  console.log(`${navigation.}`)
   }
-  const parent = useRef(null);
-
   // create panResponsder to use pan for life cycle
   const pan = useRef(new Animated.Value(0)).current
-  const slider = useRef(new Animated.Value(0)).current
-  
+  const miniPlayerOpacity = useRef(new Animated.Value(0)).current
   let panLastPosition = useRef(0).current
-  let sliderLastPosition = useRef(0).current
   let newPosition = useRef(0).current
-  
-  // button 
+  // usestate 
   const [favoriteColor, setFavoriteColor] = useState(false);
-   slider.addListener((valueChanged) => {
-       console.log(`Slider position :${valueChanged.value}`)
-       sliderLastPosition = valueChanged.value
-    })
+  const [isPlayingState, setPlayingState] = useState(false);
+  // let   isPlayingState = useRef(false).current;
+  const onShare = async () => {
+      try {
+        const result = await Share.share({
+           message: "Start Share Music!",
+        });
+        if (result.action === Share.sharedAction) {
+          if (result.activityType) {
+            // shared with activity type of result.activityType
+          } else {
+            // shared
+          }
+        } else if (result.action === Share.dismissedAction) {
+          // dismissed
+        }
+        
+      }
+      catch (error) {
+         Alert.alert(error.messsage)
+         console.log(`${error.messsage}`)
+      }
+  }
+  // Pan change Value change
     pan.addListener((value) => {  
         panLastPosition = value.value
     })
+  //
   // const [panOffsetX, setPanOffSetX] = useRef(new Animated.vale);
   const panResponder = useRef( 
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        console.log(`onMoveSetPanResponder x`)
+        return (
+          true
+        )
+      },
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
       onPanResponderGrant: (event, gesture) => {
-        // Progress bar
+        // Progress bar 
         pan.setOffset(panLastPosition)
         pan.setValue(0)
         console.log(`event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
         panLastPosition + ${panLastPosition} `)
-     
       },
-    
       onPanResponderMove: Animated.event([
         null,
         {dx: pan}
@@ -81,54 +106,24 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
         console.log(`onPanResponderRelease event.nativeEvent.locationX: + ${event.nativeEvent.locationX} + gesture : ${gesture.dx}
         + pan + ${pan} + x0 : ${gesture.x0} + moveX + ${gesture.moveX} + newPosition: ${newPosition}`)
         pan.flattenOffset();
-        // Release slider pan
-        // slider.flattenOffset();
       },
-      // onPanResponderRelease: Animated.event([
-      //   null,
-      //   {dx: pan},
-      // ]),
+      // on
     })
   ).current;
-    // slider
-    const sliderResponder = useRef( 
-      PanResponder.create({
-        onStartShouldSetPanResponder: (evt, gestureState) => true,
-        onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-        onMoveShouldSetPanResponder: (evt, gestureState) => true,
-        onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-        onPanResponderGrant: (event, gesture) => {
-          // Progress bar
-          slider.setOffset(sliderLastPosition)
-          slider.setValue(0)
-        
-       
-        },
-      
-        onPanResponderMove: Animated.event([
-          null,
-          {dy: slider}
-        ]),
-        onPanResponderRelease: (event, gesture) => {    
-          slider.flattenOffset();
-          // Release slider pan
-          // slider.flattenOffset();
-        },
-        // onPanResponderRelease: Animated.event([
-        //   null,
-        //   {dx: pan},
-        // ]),
-      })
-    ).current;
+  // UseEffect
+  useEffect(() => {
+    return () => {
+      console.log(`Unmounted MusicPlayer-screen`)
+      pan.removeAllListeners()
+    }
+  }, []) 
   
   return (
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
-          <ImageBackground style = {styles.container} source = {{uri: "https://m.media-amazon.com/images/M/     MV5BMGU5YTRjMTUtZDU4Mi00NjFlLWExYTAtMjVkN2JmOTE1Y2Q2XkEyXkFqcGdeQXVyNjE0ODc0MDc@._V1_UY268_CR43,0,182,268_AL_.jpg"}}
-          >
-          {/* <Animated.View style = {[{flex: 1}, {transform: [{translateY: slider}]}]}
-                       {...sliderResponder.panHandlers}> */}
-          <View style = {{flex: 1}}>
+          <View style = {styles.container}>
+          <MiniPlayer>
+          </MiniPlayer>
           <View style = {[styles.header, {marginLeft: 10}]}>
           <TouchableOpacity onPress = {onPressToSmallScreen}>
                 <View style = {styles.menuButton}>
@@ -187,9 +182,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                       <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {
-                        console.log(`On play`)
+                        setPlayingState(!isPlayingState)
+                        console.log(`On play ${isPlayingState}`)
                     }}>  
-                      <IconIonicons name = "play" size = {60} color = {color.palette.offWhite}/>
+                      <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {60} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {
                         console.log(`On skip next`)
@@ -221,24 +217,24 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 </View>
                 {/* Other features */}
                 <View style = {{flex: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
-                    <TouchableWithoutFeedback onPress = {() => {
+                    <TouchableOpacity onPress = {() => {
                         console.log(`On Repeat`)
                     }}>  
                     <IconIonicons name = "repeat-outline" size = {35} color = {color.palette.offWhite} />
-                    </TouchableWithoutFeedback>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {
-                        console.log(`On Share Button`)
+                        console.log(`On Download Button`)
                     }}> 
                     <IconFeather name = "download" size = {30} color = {color.palette.offWhite} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {
-                        console.log(`On download`)
+                        onShare()
+                        console.log(`On Share`)
                     }}> 
                     <IconEntypo name = "share" size = {30} color = {color.palette.offWhite} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {
                         setFavoriteColor(!favoriteColor)
-                     
                         console.log(`favoriteColor +${favoriteColor}`)
                       }}> 
                       <IconAwesome name = "heart" size = {30} color = {favoriteColor ? color.palette.orange : color.palette.offWhite} />
@@ -246,17 +242,16 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 </View>
               </View>
             </View>
-          </View>
-                    
+          </View>          
         </View>
-        {/* </Animated.View>      */}
-      </ImageBackground>
     </Screen>
   )
 })
 const styles = StyleSheet.create({
   container : {
      flex: 1,
+     borderTopLeftRadius: 15,
+    borderTopRightRadius: 15
   },
   header : {
     flex : 1.5,

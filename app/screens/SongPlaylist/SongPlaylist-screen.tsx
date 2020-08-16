@@ -12,6 +12,7 @@ import IconIonicons from "react-native-vector-icons/Ionicons"
 import IconOcticons from "react-native-vector-icons/Octicons"
 import { MusicPlayerScreen } from "../MusicPlayerScreen/MusicPlayer-screen"
 import { NONE } from "apisauce"
+import Swipeout from "react-native-swipeout"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -71,10 +72,21 @@ var SONG_DATA = [
     Duration: 100
   }
 ]
+
 // Make Song PlaylistFlatList
 const SongListItem = ({item, navigation}) => {
   console.log(`${navigation}`)
+
   return (
+    <Swipeout style = {{flex : 1}} backgroundColor = {color.palette.transparent}
+    right = {
+      [
+      {
+       text: "Delete",
+       type: "delete",
+      }
+     ]}
+   > 
     <TouchableOpacity onPress = {() => {
        const imageInfo = {
           name: item.nameSong,
@@ -85,6 +97,7 @@ const SongListItem = ({item, navigation}) => {
         // navigation.navigate("MusicPlayer", imageInfo)
       // navigation.goBack()
     }}>
+ 
     <View style = {{flex: 1, flexDirection: 'row', width: widthScreen, height: 60}}>
         {/* Image */}
         <View style = {{width: 50, height: 50, backgroundColor: color.palette.white, borderRadius: 25}}>
@@ -113,6 +126,7 @@ const SongListItem = ({item, navigation}) => {
         </View>
     </View>
     </TouchableOpacity>
+    </Swipeout>
   )
 }
 export const SongPlaylistScreen: Component = observer(function SongPlaylistScreen() {
@@ -253,14 +267,14 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
         </View> */}
         </View>
       </TouchableWithoutFeedback>
-        <View style = {{width: widthScreen, height: Platform.OS === "ios" ? heightScreen : heightScreen - 50,  position: 'absolute'}}>
+        {/* <View style = {{width: widthScreen, height: Platform.OS === "ios" ? heightScreen : heightScreen - 50,  position: 'absolute'}}>
           <Animated.View style = {[{...StyleSheet.absoluteFillObject}, {transform: [{translateY: slider}]}]}
            {...sliderResponder.panHandlers}
           >
           <MusicPlayerScreen >
           </MusicPlayerScreen>
           </Animated.View>     
-        </View>
+        </View> */}
      </Screen>
    )
 })
@@ -297,7 +311,7 @@ const styles = StyleSheet.create({
     backgroundColor: color.palette.gray16DP,
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
-    color: color.palette.gray16DP
+    color: color.palette.offWhite
   },
   textStyle : {
      color: color.palette.offWhite,
