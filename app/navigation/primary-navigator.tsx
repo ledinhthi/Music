@@ -11,7 +11,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import {PortablePlayerScreen, SettingsScreen, MusicScreen,
        MusicPlayerScreen, PlaylistScreen, VideoScreen, VideoPlayerScreen,
       AlbumSongScreen, AlbumVideoScreen, SongPlaylistScreen, VideoPlaylistScreen} from "../screens"
-// import { Image } from "react-native";
+import {Props} from "../screens/MusicPlayerScreen/MusicPlayer-screen";
 import Image from 'react-native-remote-svg'
 // import Image from 'react-native-remote-svg'
 import IconFontAweSome from 'react-native-vector-icons/FontAwesome';
@@ -85,7 +85,9 @@ const AlbumVideoStack = createNativeStackNavigator<AlbumVideoParamList>();
 const VideoStack  = createNativeStackNavigator<VideoParamList>();
 const ContainerPlayerStack = createNativeStackNavigator();
 
-export function Player() {
+export function Player(props) {
+  const lastPosition = props.lastPosition
+  console.log(`lastPosition + ${lastPosition}`)
   return (
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
@@ -94,7 +96,11 @@ export function Player() {
         stackPresentation: 'modal'
       }}
     >
-      <ContainerPlayerStack.Screen name= "player" component = {MusicPlayerScreen}/>
+      <ContainerPlayerStack.Screen name= "player">
+       {props => <MusicPlayerScreen>
+        </MusicPlayerScreen>
+        }
+      </ContainerPlayerStack.Screen>  
     </ContainerPlayerStack.Navigator>
     </NavigationContainer>
  

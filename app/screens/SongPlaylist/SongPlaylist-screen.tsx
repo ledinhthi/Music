@@ -163,9 +163,7 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
           // Progress bar
           console.log("OnTouch grant")
           slider.setOffset(sliderLastPosition)
-          slider.setValue(0)
-        
-       
+          slider.setValue(0)    
         },
       
         onPanResponderMove: Animated.event([
@@ -188,6 +186,7 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
     ).current;
    // Pull in one of our MST stores
    const rootStore = useStores();
+  //  const {}  = useStores();
    // console.log(`Store + ${rootStore}`)
    // Pull in navigation via hook
    const navigation = useNavigation();

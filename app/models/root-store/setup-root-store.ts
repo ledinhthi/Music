@@ -52,6 +52,11 @@ export async function setupRootStore() {
         AlbumVideoPlaylist: {
           NameAlbumVideo: "Vk iu video"
         }
+      },
+      Navigation: {
+        payload: {
+          valueProperty: 0
+        }
       }
     })
   } catch (e) {

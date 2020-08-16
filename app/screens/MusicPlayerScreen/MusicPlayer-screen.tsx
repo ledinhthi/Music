@@ -1,4 +1,4 @@
-import React,{useState, useRef, FunctionComponent as Component, useEffect} from "react"
+import React,{useState, useRef, FunctionComponent as Component, useEffect, ReactElement, ReactChildren, ReactNode, ReactChild} from "react"
 import { observer } from "mobx-react-lite"
 import { Animated, ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
   TextInput, Image, TouchableOpacity, Keyboard,
@@ -16,6 +16,7 @@ import IconEntypo from "react-native-vector-icons/Entypo"
 import * as ProgressBar from "react-native-progress"
 import { transform } from "@babel/core"
 import { MiniPlayer } from "./MiniPlayer"
+import { widthDeviceScreen } from "../../utils/common/definition"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -25,13 +26,14 @@ const ROOT: ViewStyle = {
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
-interface Props {
-  name: String,
-  Iconstyles: any,
-  playingState: boolean
+export interface Props {
+  name?: String,
+  Iconstyles?: any,
+  playingState?: boolean,
+  lastPosition?: number
 }
 
-export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(props) {
+export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen() {
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
@@ -46,12 +48,26 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   }
   // create panResponsder to use pan for life cycle
   const pan = useRef(new Animated.Value(0)).current
+  
   const miniPlayerOpacity = useRef(new Animated.Value(0)).current
+  // miniPlayerOpacity.interpolate({
+  //   inputRange: [0, widthDeviceScreen - 60],
+  //   outputRange: [0 , 1],
+  // })
   let panLastPosition = useRef(0).current
   let newPosition = useRef(0).current
-  // usestate 
+  // usestate ß
   const [favoriteColor, setFavoriteColor] = useState(false);
   const [isPlayingState, setPlayingState] = useState(false);
+  // use Effect
+  useEffect(() => {
+    // const lastPosition = props;
+    // const lastPosition
+    // console.log(`lastPosition+ ${lastPosition}`)
+    return () => {
+      console.log(`MusicPlayer unmounted`)
+    }
+  }, [])
   // let   isPlayingState = useRef(false).current;
   const onShare = async () => {
       try {
@@ -121,9 +137,14 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   return (
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
+         
           <View style = {styles.container}>
+          <TouchableOpacity style = {{flex : 1}} onPress = {() => {
+            console.log("OnPress on miniPlayer")
+          }}>
           <MiniPlayer>
           </MiniPlayer>
+          </TouchableOpacity>
           <View style = {[styles.header, {marginLeft: 10}]}>
           <TouchableOpacity onPress = {onPressToSmallScreen}>
                 <View style = {styles.menuButton}>

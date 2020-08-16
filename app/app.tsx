@@ -33,6 +33,7 @@ import {widthDeviceScreen, heightDeviceScreen} from  "./utils/common/definition"
 import { enableScreens } from "react-native-screens"
 import { transform } from "@babel/core"
 import { translate } from "./i18n"
+import { onSnapshot } from "mobx-state-tree"
 enableScreens()
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
@@ -43,8 +44,8 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 const App: Component<{}> = () => {
   const navigationRef = useRef<NavigationContainerRef>()
-  const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
-
+  const [rootStore, setRootStore] = useState<RootStore | undefined>()
+  
   setRootNavigation(navigationRef)
   useBackButtonHandler(navigationRef, canExit)
   const { initialNavigationState, onNavigationStateChange } = useNavigationPersistence(
@@ -55,6 +56,7 @@ const App: Component<{}> = () => {
   const pan = useRef(new Animated.Value(0)).current;
   let   isMovedFromTop = useRef(false).current;
   let   lastPosition = useRef(0).current;
+  const inputRef = useRef(null);
   pan.addListener((panValue) => {
     lastPosition = panValue.value;
     console.log(`panValue.value : ${lastPosition} `)
@@ -62,21 +64,29 @@ const App: Component<{}> = () => {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
         console.log(`onMoveShouldSetPanResponder gestureState.dy ${gestureState.dy} + gestureState.moveY ${gestureState.moveY}`)
-        return  true
+        if (lastPosition == 0) {
+          isMovedFromTop = true;
+       }
+       else if (lastPosition <= heightDeviceScreen - 60) {
+          isMovedFromTop = false;
+       }
+        if ((isMovedFromTop && gestureState.dy < 10)) {
+              return false
+        }
+        if (!isMovedFromTop &&  (-10 <= gestureState.dy  && gestureState.dy <= 10))
+        {
+          return false
+        }
+        return true
       },
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) =>
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => 
         false,
 
       onPanResponderGrant: (evt, gestureState) => {
         console.log(`PanResponderGrant ${gestureState.dy} + lastposition ${lastPosition}`)
-        if (lastPosition == 0) {
-           isMovedFromTop = true;
-        }
-        else if (lastPosition <= heightDeviceScreen - 60) {
-           isMovedFromTop = false;
-        }
         pan.setOffset(lastPosition)
         pan.setValue(0)
         // The gesture has started. Show visual feedback so the user knows
@@ -101,7 +111,6 @@ const App: Component<{}> = () => {
             return false;
         }
         pan.setValue(gestureState.dy)
-       
       },
 
       onPanResponderTerminationRequest: (evt, gestureState) =>
@@ -120,7 +129,6 @@ const App: Component<{}> = () => {
           pan.setOffset(lastPosition)
           pan.setValue(lastPosition)
         }
-        
         pan.flattenOffset()
       },
       onPanResponderTerminate: (evt, gestureEvent)  => {
@@ -138,11 +146,12 @@ const App: Component<{}> = () => {
     const widthScreen = Dimensions.get("screen").width
     const heightScreen = Dimensions.get("screen").height
     console.log(`widthScreenWindow : ${width} + heightScreenWindow : ${height} + widthScreenScreen : ${widthScreen} + heightScreenScreen : ${heightScreen}`)
+    inputRef.current.onShare
     return () => {
        console.log("Unmounted screen")
        pan.removeAllListeners();
     }
-  }, [])
+  },[lastPosition])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -165,7 +174,7 @@ const App: Component<{}> = () => {
       <Animated.View style = {[{flex: 1, ...StyleSheet.absoluteFillObject}, {transform: [{translateY: pan}]}]}
        {...panResponder.panHandlers}>
         <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets}>
-            <Player/>      
+            <Player ref = {inputRef}/>      
         </SafeAreaProvider>
       </Animated.View>
     </RootStoreProvider>

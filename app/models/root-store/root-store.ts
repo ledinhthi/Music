@@ -1,5 +1,4 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
-
 /**
  * A RootStore model.
  */
@@ -37,12 +36,32 @@ export const PlaylistsModel = types.model("PlaylistsModel", {
     AlbumSongPlaylist:  AlbumSongModel,
     AlbumVideoPlaylist:  AlbumVideoModel
 })
+// navigation
+export const PayloadObject = types.model("Payload", {
+    currentScreen: types.optional(types.string, ""),
+    property: types.optional(types.string, ""),
+    valueProperty: types.optional(types.number, 0)
+}).actions(self => ({
+    setValueProp (value) {
+        self.valueProperty = value;
+    }
+})).views(self => ({
+     get getValueProp () {
+        console.log(`self.valueProperty + ${self.valueProperty}`)
+        return self.valueProperty
+    }
+}))
+
+export const NavigationModel = types.model("NavigationModel", {
+    payload: PayloadObject
+})
 // Define Settings
 // export const SettingsModel = 
 
 // prettier-ignore
 export const RootStoreModel = types.model("RootStore").props({
-    Playlist:  PlaylistsModel
+    Playlist:  PlaylistsModel,
+    Navigation: types.maybe(NavigationModel)
 });
 
 /**
