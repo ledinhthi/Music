@@ -32,11 +32,14 @@ export interface Props {
   playingState?: boolean,
   lastPosition?: number
 }
-
-export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen() {
+export interface ParentCompProps {
+  lastPosition?: number
+}
+export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(props: ParentCompProps) {
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
+  // const lastPosition = props.lastPosition; 
   const rootStore = useStores()
   // Pull in navigation via hook
   const navigation = useNavigation();
@@ -59,15 +62,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // usestate ß
   const [favoriteColor, setFavoriteColor] = useState(false);
   const [isPlayingState, setPlayingState] = useState(false);
-  // use Effect
-  useEffect(() => {
-    // const lastPosition = props;
-    // const lastPosition
-    // console.log(`lastPosition+ ${lastPosition}`)
-    return () => {
-      console.log(`MusicPlayer unmounted`)
-    }
-  }, [])
+  const [lastPosition, setLastPosition] = useState(0);
   // let   isPlayingState = useRef(false).current;
   const onShare = async () => {
       try {
@@ -128,6 +123,9 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   ).current;
   // UseEffect
   useEffect(() => {
+    const test = props.lastPosition;
+    // setLastPosition(props.lastPosition);
+    console.log(`LastPosition + ${test}`)
     return () => {
       console.log(`Unmounted MusicPlayer-screen`)
       pan.removeAllListeners()
@@ -138,7 +136,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
          
-          <View style = {styles.container}>
+        <View style = {styles.container}>
           <TouchableOpacity style = {{flex : 1}} onPress = {() => {
             console.log("OnPress on miniPlayer")
           }}>

@@ -86,8 +86,9 @@ const VideoStack  = createNativeStackNavigator<VideoParamList>();
 const ContainerPlayerStack = createNativeStackNavigator();
 
 export function Player(props) {
+//  const lastPosition : React.n = props.lastPosition;
   const lastPosition = props.lastPosition
-  console.log(`lastPosition + ${lastPosition}`)
+  console.log(`props + ${lastPosition}`)
   return (
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
@@ -97,9 +98,17 @@ export function Player(props) {
       }}
     >
       <ContainerPlayerStack.Screen name= "player">
-       {props => <MusicPlayerScreen>
-        </MusicPlayerScreen>
+       {props =>  { 
+         const test = {
+           lastPosition: lastPosition
+         }
+         console.log(`lastPosition on stack screen  + ${lastPosition}`)
+         return (
+            <MusicPlayerScreen {...test}>
+            </MusicPlayerScreen>
+          )
         }
+       }
       </ContainerPlayerStack.Screen>  
     </ContainerPlayerStack.Navigator>
     </NavigationContainer>

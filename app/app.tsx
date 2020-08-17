@@ -53,10 +53,10 @@ const App: Component<{}> = () => {
     NAVIGATION_PERSISTENCE_KEY,
   )
   // Use panresponder for Player screen
-  const pan = useRef(new Animated.Value(0)).current;
+  const pan = useRef(new Animated.Value(heightDeviceScreen - 60)).current;
   let   isMovedFromTop = useRef(false).current;
-  let   lastPosition = useRef(0).current;
-  const inputRef = useRef(null);
+  let   lastPosition = useRef(heightDeviceScreen - 60).current;
+  const inputRef = useRef();
   pan.addListener((panValue) => {
     lastPosition = panValue.value;
     console.log(`panValue.value : ${lastPosition} `)
@@ -66,6 +66,7 @@ const App: Component<{}> = () => {
       onStartShouldSetPanResponder: (evt, gestureState) => false,
       onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        
         console.log(`onMoveShouldSetPanResponder gestureState.dy ${gestureState.dy} + gestureState.moveY ${gestureState.moveY}`)
         if (lastPosition == 0) {
           isMovedFromTop = true;
@@ -87,6 +88,7 @@ const App: Component<{}> = () => {
 
       onPanResponderGrant: (evt, gestureState) => {
         console.log(`PanResponderGrant ${gestureState.dy} + lastposition ${lastPosition}`)
+        console.log(`rootStore + ${rootStore}`)
         pan.setOffset(lastPosition)
         pan.setValue(0)
         // The gesture has started. Show visual feedback so the user knows
@@ -95,15 +97,7 @@ const App: Component<{}> = () => {
       },
       onPanResponderMove: (evt, gestureState) => {
         console.log(`moveY : ${gestureState.moveY} dy: ${gestureState.dy} y0: ${gestureState.y0}`)
-        // if (gestureState.moveY < 300) {
-        //   return false;
-        // }
-        // else if ( gestureState.moveY > heightDeviceScreen - 60) {
-        //   return false;
-        // }
-        // else {
-         
-        // }
+     
         if (isMovedFromTop && (gestureState.dy < 0)) {
             return false;
         }
@@ -139,19 +133,27 @@ const App: Component<{}> = () => {
   // Kick off initial async loading actions, like loading fonts and RootStore
   useEffect(() => {
     ;(async () => {
-      setupRootStore().then(setRootStore)
+      try {
+        const rootStore = await setupRootStore();
+        if (rootStore != null) {
+          console.log("Here")
+        }
+        setRootStore(rootStore)
+      }
+      catch (error) {
+        console.log(`error + ${error}`)
+      }
     })()
     const width = Dimensions.get("window").width
     const height = Dimensions.get("window").height
     const widthScreen = Dimensions.get("screen").width
     const heightScreen = Dimensions.get("screen").height
     console.log(`widthScreenWindow : ${width} + heightScreenWindow : ${height} + widthScreenScreen : ${widthScreen} + heightScreenScreen : ${heightScreen}`)
-    inputRef.current.onShare
     return () => {
        console.log("Unmounted screen")
        pan.removeAllListeners();
     }
-  },[lastPosition])
+  },[])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -161,6 +163,7 @@ const App: Component<{}> = () => {
 
   // otherwise, we're ready to render the app
   return (
+   
     <RootStoreProvider value={rootStore}>
       <View style = {{flex: 1}}>
       <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets} >
@@ -174,7 +177,7 @@ const App: Component<{}> = () => {
       <Animated.View style = {[{flex: 1, ...StyleSheet.absoluteFillObject}, {transform: [{translateY: pan}]}]}
        {...panResponder.panHandlers}>
         <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets}>
-            <Player ref = {inputRef}/>      
+            <Player ref = {inputRef} lastPosition = {lastPosition}/>      
         </SafeAreaProvider>
       </Animated.View>
     </RootStoreProvider>
