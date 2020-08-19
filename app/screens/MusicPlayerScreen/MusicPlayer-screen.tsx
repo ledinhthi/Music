@@ -39,7 +39,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
-  // const lastPosition = props.lastPosition; 
+  
   const rootStore = useStores()
   // Pull in navigation via hook
   const navigation = useNavigation();
@@ -52,11 +52,15 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // create panResponsder to use pan for life cycle
   const pan = useRef(new Animated.Value(0)).current
   
-  const miniPlayerOpacity = useRef(new Animated.Value(0)).current
+  const sliderPosition = useRef(new Animated.Value(0)).current
   // miniPlayerOpacity.interpolate({
   //   inputRange: [0, widthDeviceScreen - 60],
   //   outputRange: [0 , 1],
   // })
+  const opacitySlider = sliderPosition.interpolate({
+    inputRange: [0 , 760 , 836],
+    outputRange: [0, 0, 1]
+  })
   let panLastPosition = useRef(0).current
   let newPosition = useRef(0).current
   // usestate ß
@@ -123,15 +127,18 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   ).current;
   // UseEffect
   useEffect(() => {
-    const test = props.lastPosition;
-    // setLastPosition(props.lastPosition);
-    console.log(`LastPosition + ${test}`)
+ 
+    console.log(`widthDeviceScreen + ${widthDeviceScreen}`)
     return () => {
       console.log(`Unmounted MusicPlayer-screen`)
       pan.removeAllListeners()
     }
   }, []) 
-  
+
+  useEffect(() => {
+      // setLastPosition()
+     sliderPosition.setValue(props.lastPosition);
+  }, [props.lastPosition])
   return (
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
@@ -140,8 +147,11 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
           <TouchableOpacity style = {{flex : 1}} onPress = {() => {
             console.log("OnPress on miniPlayer")
           }}>
+          <Animated.View style = {{flex :1, opacity: opacitySlider}}>
+      
           <MiniPlayer>
           </MiniPlayer>
+          </Animated.View>
           </TouchableOpacity>
           <View style = {[styles.header, {marginLeft: 10}]}>
           <TouchableOpacity onPress = {onPressToSmallScreen}>
@@ -270,7 +280,7 @@ const styles = StyleSheet.create({
   container : {
      flex: 1,
      borderTopLeftRadius: 15,
-    borderTopRightRadius: 15
+     borderTopRightRadius: 15
   },
   header : {
     flex : 1.5,

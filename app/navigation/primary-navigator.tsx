@@ -66,8 +66,8 @@ export type AlbumSongParamList = {
 };
 // AlbumVideoParamList For PlaylistParam
 export type AlbumVideoParamList = {
-  AlbumVideoScreen: undefined
   VideoPlayer: undefined
+  AlbumVideoScreen: undefined
   VideoPlaylists: undefined
 }
 // VideoParamlist for video screen
@@ -94,13 +94,16 @@ export function Player(props) {
       <ContainerPlayerStack.Navigator
        screenOptions = {{
         headerShown : false,
-        stackPresentation: 'modal'
+        stackPresentation: 'modal',
       }}
+
     >
-      <ContainerPlayerStack.Screen name= "player">
+      <ContainerPlayerStack.Screen 
+      name= "player">
        {props =>  { 
          const test = {
            lastPosition: lastPosition
+        
          }
          console.log(`lastPosition on stack screen  + ${lastPosition}`)
          return (
@@ -136,9 +139,9 @@ function AlbumVideo () {
       headerShown : false
     }}
     >
+      <AlbumVideoStack.Screen name = "VideoPlaylists" component = {VideoPlaylistScreen}/>
       <AlbumVideoStack.Screen name = "AlbumVideoScreen" component = {AlbumVideoScreen}/>
       <AlbumVideoStack.Screen name = "VideoPlayer" component = {VideoPlayerScreen}/>
-      <AlbumVideoStack.Screen name = "VideoPlaylists" component = {VideoPlaylistScreen}/>
     </AlbumVideoStack.Navigator>
   )
 }

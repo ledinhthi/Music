@@ -19,8 +19,8 @@ export const AlbumVideoScreen: Component = observer(function AlbumVideoScreen() 
   // Pull in navigation via hook
   // const navigation = useNavigation()
   return (
-    <Screen style={ROOT} preset="scroll">
-      <Text preset="header" tx="AlbumVideoScreen.header" />
+    <Screen style={ROOT} preset="fixed">
+      {/* <Text preset="header" tx="AlbumVideoScreen.header" /> */}
     </Screen>
   )
 })
