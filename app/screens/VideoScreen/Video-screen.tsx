@@ -148,9 +148,8 @@ export const VideoScreen: Component = observer(function VideoScreen() {
       Alert.alert("Error Getting Data!!")
     }
   } 
-
   useEffect(() => {
-      // fetchYoutubeApi();
+      fetchYoutubeApi();
   }, [])
   useEffect(() => {
     console.log(`Re-render`)
