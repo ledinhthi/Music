@@ -210,6 +210,9 @@ function Video () {
   return (
     <VideoStack.Navigator
       initialRouteName = "Video"
+      screenOptions = {{
+        headerShown: false
+      }}
     >
         <VideoStack.Screen name = "Video" component = {VideoScreen}/>
         <VideoStack.Screen name = "VideoPlayer" component = {VideoPlayerScreen}/>
