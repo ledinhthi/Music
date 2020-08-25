@@ -180,8 +180,19 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   const onMenuButton = () => {
     navigation.dispatch(DrawerActions.openDrawer())
   }
+  const fetchSpotifyApi = async () => {
+    try {
+      const data = await fetch("")
+    }
+    catch (error){
+
+    }
+  }
   // useEffect conbine willmount, did mount, update
   useEffect(() => {
+      // get Api
+
+
     console.log(`
     "NameAlbumSong"
     ${rootStore.Playlist.AlbumSongPlaylist.NameAlbumSong}`)

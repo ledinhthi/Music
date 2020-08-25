@@ -11,7 +11,7 @@
  */
 import "./i18n"
 import "./utils/ignore-warnings"
-import React, { useState, useEffect, useRef, FunctionComponent as Component } from "react"
+import React, { useState, useEffect, useCallback, useRef,useMemo, FunctionComponent as Component } from "react"
 import {View, Dimensions, StyleSheet, PanResponder, Animated, StatusBar, Platform} from "react-native"
 import { NavigationContainerRef } from "@react-navigation/native"
 import { SafeAreaProvider, initialWindowSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
@@ -24,7 +24,7 @@ import {
   setRootNavigation,
   useNavigationPersistence,
 } from "./navigation"
-import { RootStore, RootStoreProvider, setupRootStore } from "./models"
+import { RootStore, RootStoreProvider, setupRootStore, useStores } from "./models"
 import {widthDeviceScreen, heightDeviceScreen} from  "./utils/common/definition"
 
 // This puts screens in a native ViewController or Activity. If you want fully native
@@ -33,6 +33,7 @@ import {widthDeviceScreen, heightDeviceScreen} from  "./utils/common/definition"
 import { enableScreens } from "react-native-screens"
 import { transform } from "@babel/core"
 import { translate } from "./i18n"
+import { onSnapshot } from "mobx-state-tree"
 enableScreens()
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
@@ -43,40 +44,73 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 const App: Component<{}> = () => {
   const navigationRef = useRef<NavigationContainerRef>()
-  const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
-
+  const [rootStore, setRootStore] = useState<RootStore | undefined>()
+  
   setRootNavigation(navigationRef)
   useBackButtonHandler(navigationRef, canExit)
   const { initialNavigationState, onNavigationStateChange } = useNavigationPersistence(
     storage,
     NAVIGATION_PERSISTENCE_KEY,
   )
+  // function useHookWithRefCallback() {
+  //   const ref = useRef(0)
+  //   const setRef = useCallback(node => {
+  //     if (ref.current) {
+  //       // Make sure to cleanup any events/references added to the last instance
+  //     }
+      
+  //     if (node) {
+  //       // Check if a node is actually passed. Otherwise node would be null.
+  //       // You can now do what you need to, addEventListeners, measure, etc.
+  //     }
+      
+  //     // Save a reference to the node
+  //     ref.current = node
+  //   }, [])
+    
+  //   return [setRef]
+  // }
+  // const [ref] = useHookWithRefCallback()
+
+ 
   // Use panresponder for Player screen
-  const pan = useRef(new Animated.Value(0)).current;
+  const pan = useRef(new Animated.Value(heightDeviceScreen - 60)).current;
   let   isMovedFromTop = useRef(false).current;
-  let   lastPosition = useRef(0).current;
+  let   lastPosition = useRef(heightDeviceScreen - 60).current;
+  const [tempPosition, setTempPosition] = useState(lastPosition);
+  const inputRef = useRef();
   pan.addListener((panValue) => {
     lastPosition = panValue.value;
-    console.log(`panValue.value : ${lastPosition} `)
+    setTempPosition(panValue.value)
   })
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
+        
         console.log(`onMoveShouldSetPanResponder gestureState.dy ${gestureState.dy} + gestureState.moveY ${gestureState.moveY}`)
-        return  true
+        if (lastPosition == 0) {
+          isMovedFromTop = true;
+       }
+       else if (lastPosition <= heightDeviceScreen - 60) {
+          isMovedFromTop = false;
+       }
+        if ((isMovedFromTop && gestureState.dy < 10)) {
+              return false
+        }
+        if (!isMovedFromTop &&  (-10 <= gestureState.dy  && gestureState.dy <= 10))
+        {
+          return false
+        }
+        return true
       },
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) =>
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => 
         false,
 
       onPanResponderGrant: (evt, gestureState) => {
         console.log(`PanResponderGrant ${gestureState.dy} + lastposition ${lastPosition}`)
-        if (lastPosition == 0) {
-           isMovedFromTop = true;
-        }
-        else if (lastPosition <= heightDeviceScreen - 60) {
-           isMovedFromTop = false;
-        }
+        console.log(`rootStore + ${rootStore}`)
         pan.setOffset(lastPosition)
         pan.setValue(0)
         // The gesture has started. Show visual feedback so the user knows
@@ -85,15 +119,7 @@ const App: Component<{}> = () => {
       },
       onPanResponderMove: (evt, gestureState) => {
         console.log(`moveY : ${gestureState.moveY} dy: ${gestureState.dy} y0: ${gestureState.y0}`)
-        // if (gestureState.moveY < 300) {
-        //   return false;
-        // }
-        // else if ( gestureState.moveY > heightDeviceScreen - 60) {
-        //   return false;
-        // }
-        // else {
-         
-        // }
+     
         if (isMovedFromTop && (gestureState.dy < 0)) {
             return false;
         }
@@ -101,7 +127,6 @@ const App: Component<{}> = () => {
             return false;
         }
         pan.setValue(gestureState.dy)
-       
       },
 
       onPanResponderTerminationRequest: (evt, gestureState) =>
@@ -113,14 +138,15 @@ const App: Component<{}> = () => {
         if (isMovedFromTop) {
           //  bottomPosition = heightDeviceScreen - 60;
           lastPosition = heightDeviceScreen - 60
+          setTempPosition(heightDeviceScreen - 60)
           pan.setValue(lastPosition)
         }
         else {
           lastPosition = 0
+          setTempPosition(0)
           pan.setOffset(lastPosition)
           pan.setValue(lastPosition)
         }
-        
         pan.flattenOffset()
       },
       onPanResponderTerminate: (evt, gestureEvent)  => {
@@ -128,10 +154,31 @@ const App: Component<{}> = () => {
       }
     })
   ).current
+  // const lastPositionRef = useCallback(node => {
+  //   if (node !== null) {
+  //     // lastPosition.
+  //     console.log("node is not null")
+
+  //   }
+  // }, [lastPosition]);
+  // const memoFunction = () => {
+  //   console.log(lastPosition, "memo called");
+  //   // Do something that will take a lot of processing ...
+  // };
+  // useMemo(memoFunction, [lastPosition]);
   // Kick off initial async loading actions, like loading fonts and RootStore
   useEffect(() => {
     ;(async () => {
-      setupRootStore().then(setRootStore)
+      try {
+        const rootStore = await setupRootStore();
+        if (rootStore != null) {
+          console.log("Here")
+        }
+        setRootStore(rootStore)
+      }
+      catch (error) {
+        console.log(`error + ${error}`)
+      }
     })()
     const width = Dimensions.get("window").width
     const height = Dimensions.get("window").height
@@ -142,16 +189,17 @@ const App: Component<{}> = () => {
        console.log("Unmounted screen")
        pan.removeAllListeners();
     }
-  }, [])
-
+  },[inputRef])
+  
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
   // color set in native by rootView's background color. You can replace
   // with your own loading component if you wish.
   if (!rootStore) return null
-
+  
   // otherwise, we're ready to render the app
   return (
+   
     <RootStoreProvider value={rootStore}>
       <View style = {{flex: 1}}>
       <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets} >
@@ -162,10 +210,11 @@ const App: Component<{}> = () => {
         />
       </SafeAreaProvider>
       </View>
-      <Animated.View style = {[{flex: 1, ...StyleSheet.absoluteFillObject}, {transform: [{translateY: pan}]}]}
+      <Animated.View style = {[{flex: 1, borderTopLeftRadius: 15,
+       borderTopRightRadius: 15, ...StyleSheet.absoluteFillObject}, {transform: [{translateY: pan}]}]}
        {...panResponder.panHandlers}>
         <SafeAreaProvider initialSafeAreaInsets={initialWindowSafeAreaInsets}>
-            <Player/>      
+            <Player  lastPosition = {tempPosition}/>      
         </SafeAreaProvider>
       </Animated.View>
     </RootStoreProvider>

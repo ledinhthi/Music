@@ -11,7 +11,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import {PortablePlayerScreen, SettingsScreen, MusicScreen,
        MusicPlayerScreen, PlaylistScreen, VideoScreen, VideoPlayerScreen,
       AlbumSongScreen, AlbumVideoScreen, SongPlaylistScreen, VideoPlaylistScreen} from "../screens"
-// import { Image } from "react-native";
+import {Props} from "../screens/MusicPlayerScreen/MusicPlayer-screen";
 import Image from 'react-native-remote-svg'
 // import Image from 'react-native-remote-svg'
 import IconFontAweSome from 'react-native-vector-icons/FontAwesome';
@@ -66,8 +66,8 @@ export type AlbumSongParamList = {
 };
 // AlbumVideoParamList For PlaylistParam
 export type AlbumVideoParamList = {
-  AlbumVideoScreen: undefined
   VideoPlayer: undefined
+  AlbumVideoScreen: undefined
   VideoPlaylists: undefined
 }
 // VideoParamlist for video screen
@@ -85,16 +85,34 @@ const AlbumVideoStack = createNativeStackNavigator<AlbumVideoParamList>();
 const VideoStack  = createNativeStackNavigator<VideoParamList>();
 const ContainerPlayerStack = createNativeStackNavigator();
 
-export function Player() {
+export function Player(props) {
+//  const lastPosition : React.n = props.lastPosition;
+  const lastPosition = props.lastPosition
+  console.log(`props + ${lastPosition}`)
   return (
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
        screenOptions = {{
         headerShown : false,
-        stackPresentation: 'modal'
+        stackPresentation: 'modal',
       }}
+
     >
-      <ContainerPlayerStack.Screen name= "player" component = {MusicPlayerScreen}/>
+      <ContainerPlayerStack.Screen 
+      name= "player">
+       {props =>  { 
+         const test = {
+           lastPosition: lastPosition
+        
+         }
+         console.log(`lastPosition on stack screen  + ${lastPosition}`)
+         return (
+            <MusicPlayerScreen {...test}>
+            </MusicPlayerScreen>
+          )
+        }
+       }
+      </ContainerPlayerStack.Screen>  
     </ContainerPlayerStack.Navigator>
     </NavigationContainer>
  
@@ -121,9 +139,9 @@ function AlbumVideo () {
       headerShown : false
     }}
     >
+      <AlbumVideoStack.Screen name = "VideoPlaylists" component = {VideoPlaylistScreen}/>
       <AlbumVideoStack.Screen name = "AlbumVideoScreen" component = {AlbumVideoScreen}/>
       <AlbumVideoStack.Screen name = "VideoPlayer" component = {VideoPlayerScreen}/>
-      <AlbumVideoStack.Screen name = "VideoPlaylists" component = {VideoPlaylistScreen}/>
     </AlbumVideoStack.Navigator>
   )
 }
@@ -192,6 +210,9 @@ function Video () {
   return (
     <VideoStack.Navigator
       initialRouteName = "Video"
+      screenOptions = {{
+        headerShown: false
+      }}
     >
         <VideoStack.Screen name = "Video" component = {VideoScreen}/>
         <VideoStack.Screen name = "VideoPlayer" component = {VideoPlayerScreen}/>

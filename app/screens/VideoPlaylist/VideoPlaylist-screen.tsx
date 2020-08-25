@@ -1,13 +1,14 @@
 import React, { FunctionComponent as Component } from "react"
 import { observer } from "mobx-react-lite"
-import { ViewStyle } from "react-native"
-import { Screen, Text } from "../../components"
+import { ViewStyle, View, Text, Image, FlatList } from "react-native"
+import { Screen } from "../../components"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "../models"
 import { color } from "../../theme"
+import {YouTubeStandaloneAndroid, YouTubeStandaloneIOS} from "react-native-youtube"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black,
+  backgroundColor: color.palette.bluePowder ,
 }
 
 export const VideoPlaylistScreen: Component = observer(function VideoPlaylistScreen() {
@@ -19,8 +20,13 @@ export const VideoPlaylistScreen: Component = observer(function VideoPlaylistScr
   // Pull in navigation via hook
   // const navigation = useNavigation()
   return (
-    <Screen style={ROOT} preset="scroll">
-      <Text preset="header" tx="VideoPlaylistScreen.header" />
+    <Screen style={ROOT} preset="fixed">
+      <View style= {{flex: 1, backgroundColor: 'red'}}>
+        <Text>
+            THiiiiiiiiiii
+        </Text>
+      </View>
+      {/* <Text preset="header" tx="VideoPlaylistScreen.header" /> */}
     </Screen>
   )
 })
