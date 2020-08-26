@@ -226,9 +226,10 @@ export const MusicScreen: Component = observer(function MusicScreen() {
                         style = {{position: 'absolute', top: 14, left: 7}}
                         >
                    </IconOcticons>
-                  <TextInput inlineImageLeft='search_icon' style = {styles.textInputStyle}
+                  <TextInput style = {styles.textInputStyle}
                   placeholder = {"Search Here!!"}
-                  placeholderTextColor = {color.palette.white70Percent}>                  
+                  placeholderTextColor = {color.palette.white70Percent}
+                  >                  
                   </TextInput>
                 </View>  
             </View>
@@ -318,7 +319,7 @@ const styles = StyleSheet.create({
       justifyContent: "center"
     },
     textInputStyle: {
-      height: 30,
+      height: 40,
       paddingLeft: 35,
       width: widthScreen,
       backgroundColor: color.palette.white,

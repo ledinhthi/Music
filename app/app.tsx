@@ -72,11 +72,16 @@ const App: Component<{}> = () => {
   // }
   // const [ref] = useHookWithRefCallback()
 
- 
+//  const customWidth = 
+ const customHeight = Platform.select({
+  ios:  heightDeviceScreen - 60,
+  android: heightDeviceScreen - 60 - 48
+ })
+    ;
   // Use panresponder for Player screen
-  const pan = useRef(new Animated.Value(heightDeviceScreen - 60)).current;
+  const pan = useRef(new Animated.Value(customHeight)).current;
   let   isMovedFromTop = useRef(false).current;
-  let   lastPosition = useRef(heightDeviceScreen - 60).current;
+  let   lastPosition = useRef(customHeight).current;
   const [tempPosition, setTempPosition] = useState(lastPosition);
   const inputRef = useRef();
   pan.addListener((panValue) => {
@@ -93,7 +98,7 @@ const App: Component<{}> = () => {
         if (lastPosition == 0) {
           isMovedFromTop = true;
        }
-       else if (lastPosition <= heightDeviceScreen - 60) {
+       else if (lastPosition <= customHeight) {
           isMovedFromTop = false;
        }
         if ((isMovedFromTop && gestureState.dy < 10)) {
@@ -137,8 +142,8 @@ const App: Component<{}> = () => {
         console.log(`onReleased GestureState.dy ${gestureState.dy} + GestureState.moveY + ${gestureState.moveY}`)
         if (isMovedFromTop) {
           //  bottomPosition = heightDeviceScreen - 60;
-          lastPosition = heightDeviceScreen - 60
-          setTempPosition(heightDeviceScreen - 60)
+          lastPosition = customHeight
+          setTempPosition(customHeight)
           pan.setValue(lastPosition)
         }
         else {

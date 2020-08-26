@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   textInputStyle: {
-    height: 30,
+    height: 40,
     paddingLeft: 35,
     width: widthScreen,
     backgroundColor: color.palette.gray16DP,

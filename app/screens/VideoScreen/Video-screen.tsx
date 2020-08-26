@@ -53,7 +53,7 @@ const VideoItem = ({item}) => {
   const [isShowYoutube, setShowYoutube] = useState(false)
   const url = item.snippet.thumbnails.default.url
   const VideoId = item.id.videoId
-  console.log(`props.url + ${url}`)
+  console.log(`props.url + ${url} + VideoId ${VideoId}`)
   return (
     <TouchableOpacity onPress = {() => {
       setVideoId(VideoId)
@@ -161,7 +161,7 @@ export const VideoScreen: Component = observer(function VideoScreen() {
   }
   const onSubmit = () => {
     console.log(`keySearch + ${keySearch}`)
-    textInputRef.current.clear()
+    // textInputRef.current.clear()
     setDoneLoading(true)
     fetchYoutubeApiWithKey(keySearch)
   }
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center'
     },
     textInputStyle: {
-      height: 30,
+      height: 40,
       width: widthDeviceScreen,
       paddingLeft: 35,
       marginLeft: 20,

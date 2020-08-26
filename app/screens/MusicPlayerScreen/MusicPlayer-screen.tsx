@@ -57,8 +57,14 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   //   inputRange: [0, widthDeviceScreen - 60],
   //   outputRange: [0 , 1],
   // })
+  const customHeight = Platform.select({
+    ios:  heightScreen - 60,
+    android: heightScreen - 60 - 48
+   })
+  // const inputArgument : number = heightScreen - 48
+  console.log(`heightScreen : ${heightScreen}`)
   const opacitySlider = sliderPosition.interpolate({
-    inputRange: [0 , 760 , 836],
+    inputRange: [0 , customHeight - 100 , customHeight - 50],
     outputRange: [0, 0, 1]
   })
   let panLastPosition = useRef(0).current
