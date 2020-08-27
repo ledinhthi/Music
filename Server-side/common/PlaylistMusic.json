@@ -1,0 +1,22 @@
+
+{
+ "NumberOfSongs": 10,
+ "Items": [
+        {
+            "AuthorName": "Thi1",
+            "Content": "OK",
+            "Duration": 300,
+            "MusicName": "MyLove",
+            "UrlImage": "aaaaa",
+            "UrlTrack": "aaaaa"
+        },
+        {
+            "AuthorName": "Thi1",
+            "Content": "OK",
+            "Duration": 300,
+            "MusicName": "MyLove",
+            "UrlImage": "aaaaa",
+            "UrlTrack": "aaaaa"
+        }
+    ]
+}
