@@ -2,7 +2,8 @@ import { onSnapshot } from "mobx-state-tree"
 import { RootStoreModel, RootStore, State } from "./root-store"
 import { Environment } from "../environment"
 import * as storage from "../../utils/storage"
-
+import {firebase} from "../../config/firebase"
+import { Alert } from "react-native"
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -31,6 +32,16 @@ export async function setupRootStore() {
 
   // prepare the environment that will be associated with the RootStore.
   const env = await createEnvironment()
+  // init db 
+  const firestore = firebase.auth()
+  .signInWithEmailAndPassword("ledinhthi11@gmail.com", "dananhchi1")
+  .then((response) => {
+     const db = firebase.firestore()
+     return db;
+  })
+  .catch((Error) => {
+      Alert.alert("Signin Error")
+  })
   try {
     // load data from storage
     data = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
@@ -57,6 +68,9 @@ export async function setupRootStore() {
         payload: {
           valueProperty: 0
         }
+      },
+      Database: {
+        firestore: firestore
       }
     })
   } catch (e) {

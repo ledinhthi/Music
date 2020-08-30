@@ -13,7 +13,7 @@ import IconOcticons from "react-native-vector-icons/Octicons"
 import Swipeout from "react-native-swipeout"
 import { widthDeviceScreen, heightDeviceScreen } from "../../utils/common/definition"
 import YouTube, {YouTubeStandaloneAndroid, YouTubeStandaloneIOS} from "react-native-youtube"
-import { boolean } from "mobx-state-tree/dist/internal"
+import {firebase} from "../../config/firebase"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -51,9 +51,11 @@ var DATA = [
 const VideoItem = ({item}) => {
   const [videoId, setVideoId] = useState("")
   const [isShowYoutube, setShowYoutube] = useState(false)
-  const url = item.snippet.thumbnails.default.url
-  const VideoId = item.id.videoId
-  console.log(`props.url + ${url} + VideoId ${VideoId}`)
+  const VideoId = item.VideoId
+  const title = item.Title;
+  const urlImage = item.UrlImage;
+  const description = item.Description;
+  console.log(` VideoId ${VideoId} + title : ${title}`)
   return (
     <TouchableOpacity onPress = {() => {
       setVideoId(VideoId)
@@ -63,7 +65,7 @@ const VideoItem = ({item}) => {
       <View style = {{flex : 1}}>
         <Image style = {{
           height: heightDeviceScreen * 15 / 100,zIndex : 10,   width: widthDeviceScreen * 40 /100,  resizeMode: 'cover'}} 
-         source = {{uri: url}}
+         source = {{uri: urlImage}}
         > 
         </Image>
       </View>
@@ -72,18 +74,19 @@ const VideoItem = ({item}) => {
         numberOfLines = {2}
         ellipsizeMode = "tail"
         >
-              {item.snippet.title}
+              {title}
         </Text>
         <Text style = {styles.textStyle}
          numberOfLines = {2}
          ellipsizeMode = "tail">
-              {item.snippet.description}
+              {description}
         </Text>
       </View>
     </View>
     :
     <View>
       <YouTube
+      
         videoId= {videoId} // The YouTube video ID
         play = {true}
         fullscreen = {true}
@@ -105,14 +108,15 @@ const VideoItem = ({item}) => {
 export const VideoScreen: Component = observer(function VideoScreen() {
   // Pull in one of our MST stores
   const [youtubeData, setYoutubeData] = useState([]);
+  const [fireStore, setFireStore] = useState();
   const [keySearch, setKeySearch] = useState("")
   const [doneLoading, setDoneLoading] = useState(false)
   const textInputRef = useRef()
-  // const [test, setData] = useState([]);
-  // const []
-  // OR
-  // const rootStore = useStores()
+  // get store
+  const rootStore = useStores()
   
+  
+
   // Pull in navigation via hook
   // const navigation = useNavigation()
   const fetchYoutubeApi = async () => {
@@ -149,10 +153,23 @@ export const VideoScreen: Component = observer(function VideoScreen() {
     }
   } 
   useEffect(() => {
-      fetchYoutubeApi();
-  }, [])
+    const fireStore = rootStore.Database.getFireStore;
+
+    const db = fireStore.collection("Video")
+    db.doc("VideoId").get().then(musicId => {
+      if (!musicId.exists) {
+        Alert.alert("User does not exist anymore.")
+        return;
+    }
+    const user = musicId.data().Items.forEach(item => {
+      console.log(`item + ${item.Description}`)
+    })
+    setYoutubeData(musicId.data().Items)
+    })
+    
+  }, [fireStore])
   useEffect(() => {
-    console.log(`Re-render`)
+    
   })
   
   const onChangeText = (text) => {

@@ -1,4 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { type } from "ramda";
+
 /**
  * A RootStore model.
  */
@@ -55,13 +57,24 @@ export const PayloadObject = types.model("Payload", {
 export const NavigationModel = types.model("NavigationModel", {
     payload: PayloadObject
 })
+
+export const DatabaseModel = types.model("DatabaseModel", {
+    firestore: types.frozen()
+}).views(self => {
+    return {
+        get getFireStore() {
+            return self.firestore
+        }
+    }
+})
 // Define Settings
 // export const SettingsModel = 
 
 // prettier-ignore
 export const RootStoreModel = types.model("RootStore").props({
     Playlist:  PlaylistsModel,
-    Navigation: types.maybe(NavigationModel)
+    Navigation: types.maybe(NavigationModel),
+    Database: types.maybe(DatabaseModel)
 });
 
 /**

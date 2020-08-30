@@ -2,7 +2,8 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect} from 
 import { observer } from "mobx-react-lite"
 import { ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
         TextInput, Image, TouchableOpacity, Keyboard,
-        TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, RefreshControl, ColorPropType} from "react-native"
+        TouchableWithoutFeedback, FlatList, KeyboardAvoidingView,
+         RefreshControl, ColorPropType, Alert} from "react-native"
 import { Screen } from "../../components"
 import { useNavigation, DrawerActions } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -10,6 +11,7 @@ import { color } from "../../theme"
 import Icon from "react-native-vector-icons/Feather"
 import IconOcticons from "react-native-vector-icons/Octicons"
 import Swipeout from "react-native-swipeout"
+import {firebase} from "../../config/firebase"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -191,11 +193,34 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   // useEffect conbine willmount, did mount, update
   useEffect(() => {
       // get Api
+      // firebase
+      // .auth()
+      // .signInWithEmailAndPassword("ledinhthi11@gmail.com", "dananhchi1")
+      // .then((response) => {
+      //   const db = firebase.firestore().collection("Music")
+      //   db.doc("MusicID").get().then(musicId => {
+      //     if (!musicId.exists) {
+      //       Alert.alert("User does not exist anymore.")
+      //       return;
+      //   }
+      //   const user = musicId.data().Items.forEach(item => {
+      //     console.log(`item + ${item.Description}`)
+      //   })
+      //   Alert.alert(user)
+      //   })
+      //   .catch(e => {
+      //     console.log("error" + e)
+      //   })
+       
+      // })
+      // .catch(error => {
+      //   Alert.alert(error)
+      // })
 
-
-    console.log(`
-    "NameAlbumSong"
-    ${rootStore.Playlist.AlbumSongPlaylist.NameAlbumSong}`)
+  
+   
+   
+    
     return () => {
       console.log("on un mount")
     }
