@@ -17,6 +17,8 @@ import * as ProgressBar from "react-native-progress"
 import { transform } from "@babel/core"
 import { MiniPlayer } from "./MiniPlayer"
 import { widthDeviceScreen } from "../../utils/common/definition"
+import TrackPlayer from "react-native-track-player";
+
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -39,6 +41,23 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
+  async function setup() {
+    await TrackPlayer.setupPlayer({});
+    await TrackPlayer.updateOptions({
+      stopWithApp: true,
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
+        TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
+        TrackPlayer.CAPABILITY_STOP
+      ],
+      compactCapabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE
+      ]
+    });
+  }
   
   const rootStore = useStores()
   // Pull in navigation via hook
@@ -53,16 +72,12 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   const pan = useRef(new Animated.Value(0)).current
   
   const sliderPosition = useRef(new Animated.Value(0)).current
-  // miniPlayerOpacity.interpolate({
-  //   inputRange: [0, widthDeviceScreen - 60],
-  //   outputRange: [0 , 1],
-  // })
+  
   const customHeight = Platform.select({
     ios:  heightScreen - 60,
     android: heightScreen - 60 - 48
    })
-  // const inputArgument : number = heightScreen - 48
-  console.log(`heightScreen : ${heightScreen}`)
+ 
   const opacitySlider = sliderPosition.interpolate({
     inputRange: [0 , customHeight - 100 , customHeight - 50],
     outputRange: [0, 0, 1]
@@ -133,8 +148,8 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   ).current;
   // UseEffect
   useEffect(() => {
- 
-    console.log(`widthDeviceScreen + ${widthDeviceScreen}`)
+    //Set up track player
+    setup();
     return () => {
       console.log(`Unmounted MusicPlayer-screen`)
       pan.removeAllListeners()
@@ -145,6 +160,21 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
       // setLastPosition()
      sliderPosition.setValue(props.lastPosition);
   }, [props.lastPosition])
+
+
+  // Player 
+  async function onPlay () {
+      await TrackPlayer.add({
+        id: "local-track",
+        url: require("../../../assets/HaiChuDaTung-NhuViet-6487469.mp3"),
+        title: "Pure (Demo)",
+        artist: "David Chavez",
+        artwork: "https://i.picsum.photos/id/200/200/200.jpg",
+        duration: 28
+      });
+      await TrackPlayer.play();
+     
+  }
   return (
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
@@ -216,10 +246,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                     }}>  
                       <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress = {() => {
-                        setPlayingState(!isPlayingState)
-                        console.log(`On play ${isPlayingState}`)
-                    }}>  
+                    <TouchableOpacity onPress = {onPlay}>  
                       <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {60} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {

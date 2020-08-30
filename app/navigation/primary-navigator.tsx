@@ -88,7 +88,7 @@ const ContainerPlayerStack = createStackNavigator();
 export function Player(props) {
 //  const lastPosition : React.n = props.lastPosition;
   const lastPosition = props.lastPosition
-  console.log(`props + ${lastPosition}`)
+ 
   return (
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
@@ -104,7 +104,7 @@ export function Player(props) {
            lastPosition: lastPosition
         
          }
-         console.log(`lastPosition on stack screen  + ${lastPosition}`)
+     
          return (
             <MusicPlayerScreen {...test}>
             </MusicPlayerScreen>

@@ -93,7 +93,7 @@ var SONG_DATA = [
 // Make PlaylistItem
 const PlaylistItem = ({item, navigation}) => {
   // const {width, height} = props;
-  console.log(`props.nameAlbum + ${item.nameAlbum}`)
+  
   return (
     <TouchableOpacity onPress = {() => {
       const imageInfo = {
@@ -114,7 +114,7 @@ const PlaylistItem = ({item, navigation}) => {
 }
 // Make Song PlaylistFlatList
 const SongListItem = ({item, navigation}) => {
-  console.log(`${navigation}`)
+  
   return (
     <Swipeout style = {{flex : 1 }}  backgroundColor = {color.palette.transparent} right = {[
       {

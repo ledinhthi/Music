@@ -21,41 +21,13 @@ const ROOT: ViewStyle = {
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
 
-
-var DATA = [
-  {
-    nameAlbum: "My Songs adasdasdasasdasdaasdasdas",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs1",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs2dasdsadasdsaasdasdsadsa",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs3",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs2",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs3",
-    sourceImage: ""
-  }
-]
 const VideoItem = ({item}) => {
   const [videoId, setVideoId] = useState("")
   const [isShowYoutube, setShowYoutube] = useState(false)
-  const VideoId = item.VideoId
-  const title = item.Title;
-  const urlImage = item.UrlImage;
-  const description = item.Description;
-  console.log(` VideoId ${VideoId} + title : ${title}`)
+  const VideoId = item.id.videoId;
+  const title = item.snippet.title;
+  const urlImage = item.snippet.thumbnails.high.url;
+  const description = item.snippet.description;
   return (
     <TouchableOpacity onPress = {() => {
       setVideoId(VideoId)
@@ -64,8 +36,8 @@ const VideoItem = ({item}) => {
     { isShowYoutube === false ? <View style = {styles.videoContainer}>
       <View style = {{flex : 1}}>
         <Image style = {{
-          height: heightDeviceScreen * 15 / 100,zIndex : 10,   width: widthDeviceScreen * 40 /100,  resizeMode: 'cover'}} 
-         source = {{uri: urlImage}}
+          height: heightDeviceScreen * 15 / 100, zIndex : 10,   width: widthDeviceScreen * 40 /100,  resizeMode: 'cover'}} 
+          source = {{uri: urlImage}}
         > 
         </Image>
       </View>
@@ -86,17 +58,9 @@ const VideoItem = ({item}) => {
     :
     <View>
       <YouTube
-      
         videoId= {videoId} // The YouTube video ID
         play = {true}
         fullscreen = {true}
-        // play // control playback of video with true/false
-        // fullscreen // control whether the video should play in fullscreen or inline
-        // loop // control whether the video should loop when ended
-        // onReady={}
-        // onChangeState={e => this.setState({ status: e.state })}
-        // onChangeQuality={e => this.setState({ quality: e.quality })}
-        // onError={e => this.setState({ error: e.error })}
         style={{ alignSelf: 'stretch', height: 300 }}
       />
     </View> 
@@ -114,17 +78,14 @@ export const VideoScreen: Component = observer(function VideoScreen() {
   const textInputRef = useRef()
   // get store
   const rootStore = useStores()
-  
-  
 
   // Pull in navigation via hook
   // const navigation = useNavigation()
   const fetchYoutubeApi = async () => {
     try {
-        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=songs&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
+        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=songs&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
         const json = await data.json();
         if (json != null) {
-            console.log(`json22 + ${json.items}`)
             setYoutubeData(json.items);
             
         }
@@ -134,15 +95,12 @@ export const VideoScreen: Component = observer(function VideoScreen() {
       Alert.alert("Error Getting Data!!")
     }
   } 
-  // const fetchDataWithPromise = (value) => new Promise((resolve, reject) => {
-  //    fetchYoutubeApiWithKey(value)
-  // });
+ 
   const fetchYoutubeApiWithKey =  async (value) => {
     try {
-        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${value}&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
+        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${value}&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
         const json = await data.json();
         if (json != null) {
-            console.log(`json22 + ${json.items}`)
             setYoutubeData(json.items);
             setDoneLoading(false)      
         }
@@ -153,20 +111,7 @@ export const VideoScreen: Component = observer(function VideoScreen() {
     }
   } 
   useEffect(() => {
-    const fireStore = rootStore.Database.getFireStore;
-
-    const db = fireStore.collection("Video")
-    db.doc("VideoId").get().then(musicId => {
-      if (!musicId.exists) {
-        Alert.alert("User does not exist anymore.")
-        return;
-    }
-    const user = musicId.data().Items.forEach(item => {
-      console.log(`item + ${item.Description}`)
-    })
-    setYoutubeData(musicId.data().Items)
-    })
-    
+    fetchYoutubeApi()
   }, [fireStore])
   useEffect(() => {
     
@@ -195,7 +140,6 @@ export const VideoScreen: Component = observer(function VideoScreen() {
           <ActivityIndicator style = 
           {{flex: 1, ...StyleSheet.absoluteFillObject}}
           size = {"large"}
-          
           />
         </Modal>
        </View>
@@ -221,7 +165,6 @@ export const VideoScreen: Component = observer(function VideoScreen() {
              placeholderTextColor = {color.palette.white70Percent}
              onChangeText = {onChangeText}
              onSubmitEditing = {onSubmit}
-
              >                  
             </TextInput>
        </View>  
@@ -229,7 +172,6 @@ export const VideoScreen: Component = observer(function VideoScreen() {
           <FlatList 
             showsHorizontalScrollIndicator = {false}
             style = {styles.content}
-            // bounces = {true}
             data = {youtubeData}
             horizontal = {false}
             renderItem = {({item}) => (
@@ -247,13 +189,12 @@ export const VideoScreen: Component = observer(function VideoScreen() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      margin: 10
+      marginLeft: 10
     },
     videoContainer: {
       width: widthDeviceScreen,
       height: heightDeviceScreen * 15 / 100,
       flexDirection :'row',
-      marginVertical: 1
     },
  
     titleContainer: {

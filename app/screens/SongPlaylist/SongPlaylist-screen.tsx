@@ -75,7 +75,7 @@ var SONG_DATA = [
 
 // Make Song PlaylistFlatList
 const SongListItem = ({item, navigation}) => {
-  console.log(`${navigation}`)
+  
 
   return (
     <Swipeout style = {{flex : 1}} backgroundColor = {color.palette.transparent}
@@ -186,12 +186,10 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
     ).current;
    // Pull in one of our MST stores
    const rootStore = useStores();
-  //  const {}  = useStores();
-   // console.log(`Store + ${rootStore}`)
-   // Pull in navigation via hook
+
    const navigation = useNavigation();
    useEffect(()=> {
-     console.log(`screenWidth + ${widthScreen} + heightScreen + ${heightScreen}`)
+     
    })
    function onBackButton() {
 

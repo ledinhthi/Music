@@ -67,7 +67,8 @@ export async function setupRootStore() {
       Navigation: {
         payload: {
           valueProperty: 0
-        }
+        },
+        isLogin: false
       },
       Database: {
         firestore: firestore

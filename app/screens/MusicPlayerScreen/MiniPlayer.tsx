@@ -27,7 +27,7 @@ export const MiniPlayer : Component =  observer(function MiniPlayer (props : Pro
         const playingState = props.playingState;
         const styles = props.Iconstyles;
         setPlayingState(playingState)
-        console.log(` name + ${name} + playingState ${playingState}`)
+       
         return () => {
             console.log(` Unmounted`)
         }

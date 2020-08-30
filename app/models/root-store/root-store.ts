@@ -1,5 +1,4 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
-import { type } from "ramda";
+import { Instance, SnapshotOut, types, SnapshotIn } from "mobx-state-tree"
 
 /**
  * A RootStore model.
@@ -49,13 +48,28 @@ export const PayloadObject = types.model("Payload", {
     }
 })).views(self => ({
      get getValueProp () {
-        console.log(`self.valueProperty + ${self.valueProperty}`)
+    
         return self.valueProperty
     }
 }))
 
 export const NavigationModel = types.model("NavigationModel", {
-    payload: PayloadObject
+    payload: PayloadObject,
+    isLogin: types.boolean
+}).views(self => {
+    return {
+        getIsLogin() {
+       
+            return self.isLogin
+        }
+    }
+}).actions(self => {
+    return {
+        setIsLogin<T>(key: keyof SnapshotIn<typeof self>, value: T) {
+            (self[key] as T) = value;
+          
+          }
+    }
 })
 
 export const DatabaseModel = types.model("DatabaseModel", {

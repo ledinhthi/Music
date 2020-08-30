@@ -9,6 +9,7 @@
 // It's easier just to leave it here.
 import App from "./app/app.tsx"
 import { AppRegistry } from "react-native"
+import TrackPlayer from 'react-native-track-player';
 
 /**
  * This needs to match what's found in your app_delegate.m and MainActivity.java.
@@ -27,4 +28,5 @@ if (__DEV__ && SHOW_STORYBOOK) {
   RootComponent = StorybookUIRoot
 }
 AppRegistry.registerComponent(APP_NAME, () => RootComponent)
+TrackPlayer.registerPlaybackService(() => require('./app/services/api/media-player-handler'));
 
