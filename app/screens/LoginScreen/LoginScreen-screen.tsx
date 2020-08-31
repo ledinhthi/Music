@@ -39,9 +39,10 @@ export const LoginScreen: Component = observer(function LoginScreen() {
         , marginRight: widthDeviceScreen * 15 / 100, marginTop: heightDeviceScreen* 7 / 100}} labelTx = {"Username"} inputStyle = {{color: color.palette.offWhite }} />
         <TextField style = {{width: widthDeviceScreen * 70 / 100, height: heightDeviceScreen * 15 / 100, marginLeft: widthDeviceScreen * 15 / 100
         , marginRight: widthDeviceScreen * 15 / 100, marginTop: -heightDeviceScreen* 7/ 100}} labelTx = {"Password"} inputStyle = {{color: color.palette.offWhite }}
+        secureTextEntry = {true}
         />
-        <Button textStyle = {{color: color.palette.gray08DP, fontSize : 18}} text = {"Đăng nhập"} style = {{width: widthDeviceScreen * 40 / 100, height: heightDeviceScreen * 5 / 100, 
-           backgroundColor: "blue", marginTop: -heightDeviceScreen* 3/ 100, alignSelf: 'center'}}
+        <Button textStyle = {{color: color.palette.gray08DP, fontSize : 18}} text = {"Đăng nhập"} style = {{width: widthDeviceScreen * 40 / 100, height: heightDeviceScreen * 7 / 100, 
+           backgroundColor: "blue", marginTop: -heightDeviceScreen* 3/ 100, alignSelf: 'center', borderRadius: 20}}
            onPress = {() => {
               if (rootStore != null) {
                 rootStore.Navigation.setIsLogin("isLogin", true)

@@ -11,27 +11,19 @@ import {heightDeviceScreen, widthDeviceScreen} from "../../utils/common/definiti
 import {IconAwesome, IconEntypo, IconFeather, 
         IconIonicons, IconMaterial,IconOcticons} from "../../utils/common/definition"
 
-interface Props {
-    name: String,
-    Iconstyles: any,
-    playingState: boolean
+export interface playerInfor {
+    isPlayingState? : boolean
 }
-
-export const MiniPlayer : Component =  observer(function MiniPlayer (props : Props) {
+export const MiniPlayer : Component =  observer(function MiniPlayer (prop : playerInfor) {
 
     const [favoriteColor, setFavoriteColor] = useState(false);
     const [isPlayingState, setPlayingState] = useState(false);
     
     useEffect(()=> {
-        const name = props.name;
-        const playingState = props.playingState;
-        const styles = props.Iconstyles;
-        setPlayingState(playingState)
-       
-        return () => {
-            console.log(` Unmounted`)
-        }
-    }, [])
+        const isPlaying = prop.isPlayingState;
+        setPlayingState(isPlaying)
+    })
+
     return (    
         <View style = {styles.container}>
             <View style = {styles.itemContainer}>

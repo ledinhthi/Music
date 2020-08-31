@@ -17,7 +17,9 @@ import * as ProgressBar from "react-native-progress"
 import { transform } from "@babel/core"
 import { MiniPlayer } from "./MiniPlayer"
 import { widthDeviceScreen } from "../../utils/common/definition"
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, { STATE_PLAYING, ProgressComponent, STATE_BUFFERING} from "react-native-track-player";
+import { TraceMode } from "mobx/lib/internal"
+import { State } from "react-powerplug"
 
 
 const ROOT: ViewStyle = {
@@ -57,8 +59,16 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
         TrackPlayer.CAPABILITY_PAUSE
       ]
     });
+    await TrackPlayer.add({
+      id: "local-track",
+      url: require("../../../assets/HaiChuDaTung-NhuViet-6487469.mp3"),
+      title: "Pure (Demo)",
+      artist: "David Chavez",
+      artwork: "https://i.picsum.photos/id/200/200/200.jpg",
+      duration: 28
+    });
   }
-  
+
   const rootStore = useStores()
   // Pull in navigation via hook
   const navigation = useNavigation();
@@ -86,8 +96,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   let newPosition = useRef(0).current
   // usestate ß
   const [favoriteColor, setFavoriteColor] = useState(false);
-  const [isPlayingState, setPlayingState] = useState(false);
+  const [isPlayingState, setPlayingState] = useState(true);
   const [lastPosition, setLastPosition] = useState(0);
+  const [duration, setDuration] = useState(0);
+
   // let   isPlayingState = useRef(false).current;
   const onShare = async () => {
       try {
@@ -149,7 +161,19 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // UseEffect
   useEffect(() => {
     //Set up track player
-    setup();
+    setup()
+    TrackPlayer.getDuration().then((duration) => {
+      setDuration(duration)
+      // 0.980392156862745
+      console.log(`Current duration + ${duration}`)
+    })
+    TrackPlayer.getPosition().then((position) => {
+      // setDuration(duration)
+      // 0.980392156862745
+      console.log(`position + ${position}`)
+    })
+   
+  
     return () => {
       console.log(`Unmounted MusicPlayer-screen`)
       pan.removeAllListeners()
@@ -163,17 +187,33 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
 
 
   // Player 
+  const processPlayState = () => {
+    let playState = "";
+    TrackPlayer.getState().then((state) => {
+        console.log(`State + ${state}`)
+       
+        console.log(`State + ${playState} +  STATE_PLAYING + ${STATE_PLAYING}`)
+        if (state == STATE_PLAYING) {
+          console.log(`Playstate`)
+           onPause().then(() => {
+             setPlayingState(true)
+           })
+        }
+        else {
+           onPlay().then(() => {
+            setPlayingState(false)
+           })
+        }
+    }).catch(error => {
+       console.log(`Error`)
+    })
+   
+  }
+  async function onPause() {
+      await TrackPlayer.pause();
+  }
   async function onPlay () {
-      await TrackPlayer.add({
-        id: "local-track",
-        url: require("../../../assets/HaiChuDaTung-NhuViet-6487469.mp3"),
-        title: "Pure (Demo)",
-        artist: "David Chavez",
-        artwork: "https://i.picsum.photos/id/200/200/200.jpg",
-        duration: 28
-      });
       await TrackPlayer.play();
-     
   }
   return (
     <Screen style={ROOT} preset="fixed">
@@ -184,8 +224,9 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
             console.log("OnPress on miniPlayer")
           }}>
           <Animated.View style = {{flex :1, opacity: opacitySlider}}>
-      
-          <MiniPlayer>
+          
+          <MiniPlayer   {...{
+              isPlayingState : isPlayingState}}>
           </MiniPlayer>
           </Animated.View>
           </TouchableOpacity>
@@ -246,7 +287,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                     }}>  
                       <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress = {onPlay}>  
+                    <TouchableOpacity onPress = {processPlayState}>  
                       <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {60} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {() => {

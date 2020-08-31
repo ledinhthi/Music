@@ -102,7 +102,6 @@ export function Player(props) {
        {props =>  { 
          const test = {
            lastPosition: lastPosition
-        
          }
      
          return (
