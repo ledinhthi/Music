@@ -137,7 +137,7 @@ const SongListItem = ({item, navigation}) => {
        
         <View style = {{width: 50, height: 50, backgroundColor: color.palette.white, borderRadius: 25}}>
             <Image style = {{width : 50, height: 50, borderRadius: 50/2,  resizeMode: 'cover'}}
-              source = {{uri: "https://m.media-amazon.com/images/M/MV5BMGU5YTRjMTUtZDU4Mi00NjFlLWExYTAtMjVkN2JmOTE1Y2Q2XkEyXkFqcGdeQXVyNjE0ODc0MDc@._V1_UY268_CR43,0,182,268_AL_.jpg"}}
+              source = {{uri: item.urlImage}}
             >
             </Image>
         </View>
@@ -147,12 +147,12 @@ const SongListItem = ({item, navigation}) => {
          }}>
           {/* Namssong */}
           <Text style = {[styles.textStyle, {fontSize: 15}]}>
-            {item.nameSong}
+            {item.title}
           </Text>
          
           {/* NameAuthor */}
           <Text style = {[styles.textStyle, {fontSize: 15}]}> 
-          {item.nameAuthor}
+          {item.author}
           </Text>
         </View>
         {/* Duration */}
@@ -168,6 +168,10 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   // Create state
   const [isChoseAlbum, setIsChoseAlbum] = useState(false);
   const [urlChoseAlbum, setUrlChoseAlbum] = useState("");
+  const [vietnamAlbum, setVietNameAlbum] = useState({
+    "AlbumName": "",
+    "Songs": []
+  })
   // useEffect(() => {
   //   // get url image from chose Album
   //   console.log("useEffect")
@@ -216,10 +220,13 @@ export const MusicScreen: Component = observer(function MusicScreen() {
       // .catch(error => {
       //   Alert.alert(error)
       // })
-
-  
-   
-   
+    const vietnamAlbumName = rootStore.Playlist.AlbumSongPlaylist.getAlbumName();
+    const listVietnamSongs = rootStore.Playlist.AlbumSongPlaylist.getListSongs();
+    var vietnamAlbumData = {
+      "AlbumName" : vietnamAlbumName,
+      "Songs": listVietnamSongs
+    }
+   setVietNameAlbum(vietnamAlbumData)
     
     return () => {
       console.log("on un mount")
@@ -269,7 +276,7 @@ export const MusicScreen: Component = observer(function MusicScreen() {
             style = {{marginTop: 10}}
             bounces = {false}
             horizontal = {true}
-            data ={DATA}
+            data = {DATA}
             keyExtractor = {(item) => {
               return item.nameAlbum
             }}
@@ -294,7 +301,7 @@ export const MusicScreen: Component = observer(function MusicScreen() {
            style = {{flex: 1, marginTop: 10, marginLeft : 10}}
            bounces = {false}
            horizontal = {false}
-           data ={SONG_DATA}
+           data ={vietnamAlbum.Songs}
            renderItem = {({item}) => (
               <SongListItem item = {item} navigation = {navigation}/>
              )

@@ -57,7 +57,7 @@ const App: Component<{}> = observer(() => {
   )
 
  const customHeight = Platform.select({
-  ios:  heightDeviceScreen - 60,
+  ios:  heightDeviceScreen - 70,
   android: heightDeviceScreen - 60 - 48
  })
     ;

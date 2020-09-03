@@ -29,6 +29,7 @@ export async function createEnvironment() {
 export async function setupRootStore() {
   let rootStore: RootStore
   let data: any
+  let vietnamData : any
 
   // prepare the environment that will be associated with the RootStore.
   const env = await createEnvironment()
@@ -36,32 +37,38 @@ export async function setupRootStore() {
   const firestore = firebase.auth()
   .signInWithEmailAndPassword("ledinhthi11@gmail.com", "dananhchi1")
   .then((response) => {
-     const db = firebase.firestore()
-     return db;
+      console.log("Sign in ok")
+      const usersRef = firebase.firestore().collection('Music')
+      usersRef
+          .doc("VIETNAM")
+          .get()
+          .then((data) => {
+            vietnamData = data.data();
+            if (rootStore != null) {
+              rootStore.Playlist.AlbumSongPlaylist.setAlbumName(vietnamData.AlbumName)
+              rootStore.Playlist.AlbumSongPlaylist.setListSongs(vietnamData.Songs)
+            }
+            else {
+              console.log("rootStore is null can not setData")
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          });
   })
   .catch((Error) => {
       Alert.alert("Signin Error")
   })
+
+
   try {
     // load data from storage
     data = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
-    console.log(`Data: ${data}`)
-    
     rootStore = RootStoreModel.create({
       Playlist: {
         AlbumSongPlaylist: {
-          NameAlbumSong: "Vk iu",
-          AlbumSong: [
-            {
-              NameSong: "123",
-              NameAuthor: "ThiHa",
-              isPlaying: false
-            }
-          ]
-
-        },
-        AlbumVideoPlaylist: {
-          NameAlbumVideo: "Vk iu video"
+          AlbumName:  "", 
+          Songs: []
         }
       },
       Navigation: {

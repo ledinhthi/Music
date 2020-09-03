@@ -12,7 +12,8 @@ import {IconAwesome, IconEntypo, IconFeather,
         IconIonicons, IconMaterial,IconOcticons} from "../../utils/common/definition"
 
 export interface playerInfor {
-    isPlayingState? : boolean
+    isPlayingState? : boolean,
+    processPlayState?: any
 }
 export const MiniPlayer : Component =  observer(function MiniPlayer (prop : playerInfor) {
 
@@ -29,12 +30,16 @@ export const MiniPlayer : Component =  observer(function MiniPlayer (prop : play
             <View style = {styles.itemContainer}>
                 {/* Favorite Icon */}
                 <View style = {styles.favoriteIcon}>
-                <TouchableOpacity onPress = {() => {
+                {/* <TouchableOpacity onPress = {() => {
                         setFavoriteColor(!favoriteColor)
                         console.log(`favoriteColor +${favoriteColor}`)
                       }}> 
                       <IconAwesome name = {"heart"} size = {30} color = {favoriteColor ? color.palette.orange : color.palette.offWhite} />
-                    </TouchableOpacity>
+                </TouchableOpacity> */}
+                <View style = {{width:  50 , height : 50,  borderRadius: 25, backgroundColor: color.palette.offWhite }}>
+                    
+                </View>
+               
                 </View>
                 {/* Content */}
                 <View style = {styles.textContent}>
@@ -46,13 +51,9 @@ export const MiniPlayer : Component =  observer(function MiniPlayer (prop : play
                       <Text style = {[styles.textStyle, {fontSize: 15, color: color.palette.white70Percent}]}> 
                             Sharaha
                       </Text>
-
                 </View>
                 <View style = {styles.playerButton}>
-                    <TouchableOpacity onPress = {() => {
-                        setPlayingState(!isPlayingState)
-                        console.log(`On play ${isPlayingState}`)
-                    }}>  
+                    <TouchableOpacity onPress = {prop.processPlayState}>  
                       <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {40} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
                 </View>
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     },
     itemContainer: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'row'
     },
     favoriteIcon : {
         flex: 1,

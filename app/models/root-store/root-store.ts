@@ -9,33 +9,52 @@ export enum State {
 }
 // Define songmodel
 export const SongModel = types.model("Song", {
-    NameSong: types.optional(types.string, ""),
-    NameAuthor: types.optional(types.string, ""),
-    UrlImage: types.optional(types.string, ""),
-    Duration: types.optional(types.number, 0),
-    isPlaying: types.optional(types.boolean, false)
+    title: types.optional(types.string, ""),
+    author: types.optional(types.string, ""),
+    urlImage: types.optional(types.string, ""),
+    duration: types.optional(types.number, 0),
+    urlSong: types.optional(types.string, ""),
+    content: types.optional(types.string, "")
 })
-// Define VideoModel
-export const VideoModel = types.model("Video", {
-    NameVideo: types.optional(types.string, ""),
-    NameAuthor: types.optional(types.string, ""),
-    UrlViddeo: types.optional(types.string, ""),
-    isPlaying: types.optional(types.boolean, false)
-});
+// // Define VideoModel
+// export const VideoModel = types.model("Video", {
+//     NameVideo: types.optional(types.string, ""),
+//     NameAuthor: types.optional(types.string, ""),
+//     UrlViddeo: types.optional(types.string, ""),
+//     isPlaying: types.optional(types.boolean, false)
+// });
 // Define albumSongs
 export const AlbumSongModel = types.model("AlbumSong", {
-    NameAlbumSong: types.optional(types.string, ""),
-    AlbumSong: types.array(SongModel)
+    AlbumName: types.optional(types.string, ""),
+    Songs: types.array(SongModel)
 })
+.actions(self => ({
+    setAlbumName (albumName) {
+        console.log(`AlbumName` + albumName)
+        self.AlbumName = albumName
+    },
+    setListSongs (listSong) {
+        self.Songs = listSong
+    }
+}))
+.views(self => ({
+     getAlbumName () {
+        console.log("self.AlbumName" + self.AlbumName)
+        return self.AlbumName;
+     },
+     getListSongs () {
+        console.log("NumberOf songs" + self.Songs.length)
+        return self.Songs;
+     }
+}))
 // Define albumVideos
-export const AlbumVideoModel = types.model("AlbumVideo", {
-    NameAlbumVideo: types.optional(types.string, ""),
-    AlbumVideo: types.array(VideoModel)
-})
+// export const AlbumVideoModel = types.model("AlbumVideo", {
+//     NameAlbumVideo: types.optional(types.string, ""),
+//     AlbumVideo: types.array(VideoModel)
+// })
 // Define Playlists
 export const PlaylistsModel = types.model("PlaylistsModel", {
-    AlbumSongPlaylist:  AlbumSongModel,
-    AlbumVideoPlaylist:  AlbumVideoModel
+    AlbumSongPlaylist:  AlbumSongModel
 })
 // navigation
 export const PayloadObject = types.model("Payload", {
@@ -59,7 +78,6 @@ export const NavigationModel = types.model("NavigationModel", {
 }).views(self => {
     return {
         getIsLogin() {
-       
             return self.isLogin
         }
     }
@@ -85,7 +103,7 @@ export const DatabaseModel = types.model("DatabaseModel", {
 // export const SettingsModel = 
 
 // prettier-ignore
-export const RootStoreModel = types.model("RootStore").props({
+export const RootStoreModel = types.model("RootStore",{
     Playlist:  PlaylistsModel,
     Navigation: types.maybe(NavigationModel),
     Database: types.maybe(DatabaseModel)

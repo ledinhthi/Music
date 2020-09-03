@@ -20,7 +20,7 @@ import { widthDeviceScreen } from "../../utils/common/definition"
 import TrackPlayer, { STATE_PLAYING, ProgressComponent, STATE_BUFFERING} from "react-native-track-player";
 import { TraceMode } from "mobx/lib/internal"
 import { State } from "react-powerplug"
-
+import Video from 'react-native-video'
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -61,7 +61,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
     });
     await TrackPlayer.add({
       id: "local-track",
-      url: require("../../../assets/HaiChuDaTung-NhuViet-6487469.mp3"),
+      url: "https://zingmp3.vn/album/Top-100-Bai-Hat-Nhac-Tre-Hay-Nhat-Various-Artists/ZWZB969E.html",
       title: "Pure (Demo)",
       artist: "David Chavez",
       artwork: "https://i.picsum.photos/id/200/200/200.jpg",
@@ -209,24 +209,35 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
     })
    
   }
+  // 
+  async function onNext() {
+    console.log(`Skip to next`)
+    await TrackPlayer.skipToNext();
+  }
+  async function onPrevious() {
+    console.log(`Skip to Previous`)
+    await TrackPlayer.skipToPrevious();
+  }
   async function onPause() {
+      console.log(`onPause`)
       await TrackPlayer.pause();
   }
   async function onPlay () {
+      console.log(`onPlay`)
       await TrackPlayer.play();
   }
   return (
     <Screen style={ROOT} preset="fixed">
             {/* Image backgorund */}
-         
         <View style = {styles.container}>
           <TouchableOpacity style = {{flex : 1}} onPress = {() => {
             console.log("OnPress on miniPlayer")
           }}>
           <Animated.View style = {{flex :1, opacity: opacitySlider}}>
           
-          <MiniPlayer   {...{
-              isPlayingState : isPlayingState}}>
+          <MiniPlayer   
+          {...{isPlayingState : isPlayingState,
+               processPlayState: processPlayState}}>
           </MiniPlayer>
           </Animated.View>
           </TouchableOpacity>
@@ -281,18 +292,13 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 {/* Play,Pause,Prev,next button */}
                 <View style = {{flex: 3, flexDirection: 'row', marginTop: 30,
                 alignItems: 'center'}}>
-                    
-                    <TouchableOpacity onPress = {() => {
-                        console.log(`On Skip previous`)
-                    }}>  
+                    <TouchableOpacity onPress = {onPrevious}>  
                       <IconMaterial name = "skip-previous" size = {60} color = {color.palette.offWhite} style = {{marginLeft: 50, marginRight: 50}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress = {processPlayState}>  
                       <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {60} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress = {() => {
-                        console.log(`On skip next`)
-                    }}>    
+                    <TouchableOpacity onPress = {onNext}>    
                       <IconMaterial name = "skip-next" size = {60} color = {color.palette.offWhite} 
                       style = {{marginLeft: 50, marginRight: 50}}/>
                     </TouchableOpacity>  
@@ -318,8 +324,28 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
 
                     </View>
                 </View>
+                {/* https://api.soundcloud.com/tracks/137422827/stream?clien_id=MS6eQWZ2N3pzqid7M5U6rpiwvPzYqaNF */}
                 {/* Other features */}
+             
+
                 <View style = {{flex: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
+                <Video source={{uri: "https://zingmp3.vn/album/Top-100-Bai-Hat-Nhac-Tre-Hay-Nhat-Various-Artists/ZWZB969E.html"}}
+                      //  ref="audio"
+                       volume={1.0}
+                       muted={false}
+                       paused = {false}
+                       onError = {(error) => {
+                         console.log(error)
+                       }}
+                      //  paused={paused}
+                       playInBackground={true}
+                       playWhenInactive={true}
+                      //  onProgress={this.onPlayProgress}
+                      //  onEnd={this.onPlayEnd}
+                       resizeMode="cover"
+                       repeat={false}
+
+                       />
                     <TouchableOpacity onPress = {() => {
                         console.log(`On Repeat`)
                     }}>  
