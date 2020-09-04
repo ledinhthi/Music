@@ -43,7 +43,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
-  async function setup() {
+  async function setup(trackInfo) {
     await TrackPlayer.setupPlayer({});
     await TrackPlayer.updateOptions({
       stopWithApp: true,
@@ -59,16 +59,17 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
         TrackPlayer.CAPABILITY_PAUSE
       ]
     });
+    var data : string = trackInfo["urlSong"]
     await TrackPlayer.add({
-      id: "local-track",
-      url: "https://zingmp3.vn/album/Top-100-Bai-Hat-Nhac-Tre-Hay-Nhat-Various-Artists/ZWZB969E.html",
-      title: "Pure (Demo)",
-      artist: "David Chavez",
-      artwork: "https://i.picsum.photos/id/200/200/200.jpg",
-      duration: 28
+      id: 'trackId',
+      url: "https://mp3-s1-zmp3.zadn.vn/276ef4b7d0f039ae60e1/3055462972925438680?authen=exp=1599314241~acl=/276ef4b7d0f039ae60e1/*~hmac=b6bb23d54bed259aed93f2f197e338a6",
+      title: trackInfo["title"],
+      artist: trackInfo["author"],
+      artwork: trackInfo["urlImage"],
+      duration: trackInfo["duration"]
     });
   }
-
+  
   const rootStore = useStores()
   // Pull in navigation via hook
   const navigation = useNavigation();
@@ -99,7 +100,8 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   const [isPlayingState, setPlayingState] = useState(true);
   const [lastPosition, setLastPosition] = useState(0);
   const [duration, setDuration] = useState(0);
-
+  const [trackInfo, setTrackInfo] = useState({});
+  const [songUrl, setSongUrl] = useState("");
   // let   isPlayingState = useRef(false).current;
   const onShare = async () => {
       try {
@@ -161,17 +163,21 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // UseEffect
   useEffect(() => {
     //Set up track player
-    setup()
-    TrackPlayer.getDuration().then((duration) => {
-      setDuration(duration)
-      // 0.980392156862745
-      console.log(`Current duration + ${duration}`)
-    })
-    TrackPlayer.getPosition().then((position) => {
-      // setDuration(duration)
-      // 0.980392156862745
-      console.log(`position + ${position}`)
-    })
+    const trackInforTemp = rootStore.Navigation.getPayload()
+    console.log("trackInfor", trackInforTemp.urlSong)
+    setTrackInfo(trackInforTemp);
+    setSongUrl(trackInforTemp.urlSong)
+    setup(trackInforTemp)
+    // TrackPlayer.getDuration().then((duration) => {
+    //   setDuration(duration)
+    //   // 0.980392156862745
+    //   console.log(`Current duration + ${duration}`)
+    // })
+    // TrackPlayer.getPosition().then((position) => {
+    //   // setDuration(duration)
+    //   // 0.980392156862745
+    //   console.log(`position + ${position}`)
+    // })
    
   
     return () => {
@@ -256,10 +262,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
             <View style = {{flex: 4 }}>
               <View style = {{flex: 1, alignItems: 'center', marginTop: 180}}>
                   <Text style = {[styles.textStyle, {fontSize: 20}]}>
-                      {"Perfect"}
+                      {trackInfo["title"]}
                   </Text>
                   <Text style = {[styles.textStyle, {marginTop: 5, fontSize: 15, fontWeight:'normal', color: 'gray'}]}>
-                      {"Edsharen"}
+                      {trackInfo["author"]}
                   </Text>
               </View>
             </View>
@@ -271,16 +277,16 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                     {/* Image */}
                     <View style = {{width: 50 , height : 50, borderRadius: 25, backgroundColor: color.palette.white}}>
                     <Image style = {{width : 50, height: 50, borderRadius: 50/2,  resizeMode: 'cover'}}
-                        source = {{uri: "https://m.media-amazon.com/images/M/MV5BMGU5YTRjMTUtZDU4Mi00NjFlLWExYTAtMjVkN2JmOTE1Y2Q2XkEyXkFqcGdeQXVyNjE0ODc0MDc@._V1_UY268_CR43,0,182,268_AL_.jpg"}}
+                        source = {{uri: trackInfo["urlImage"]}}
                       >
                     </Image>
                     </View>
                     <View style = {{flex: 1, flexDirection: 'column', height: 50, marginLeft: 20, marginRight: 30, justifyContent: 'center'}}>
                         <Text style = {[styles.textStyle, {fontSize: 15}]}>
-                          {"Perfect"}
+                          {trackInfo["title"]}
                       </Text>
                       <Text style = {[styles.textStyle, {marginTop: 5, fontSize: 10, fontWeight:'normal', color: 'gray'}]}>
-                          {"Edsharen"}
+                          {trackInfo["author"]}
                       </Text>
                     </View>
                   </View>
@@ -329,7 +335,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
              
 
                 <View style = {{flex: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
-                <Video source={{uri: "https://zingmp3.vn/album/Top-100-Bai-Hat-Nhac-Tre-Hay-Nhat-Various-Artists/ZWZB969E.html"}}
+                {/* <Video source={{uri: "https://zingmp3.vn/album/Top-100-Bai-Hat-Nhac-Tre-Hay-Nhat-Various-Artists/ZWZB969E.html"}}
                       //  ref="audio"
                        volume={1.0}
                        muted={false}
@@ -345,7 +351,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                        resizeMode="cover"
                        repeat={false}
 
-                       />
+                       /> */}
                     <TouchableOpacity onPress = {() => {
                         console.log(`On Repeat`)
                     }}>  

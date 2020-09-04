@@ -29,7 +29,7 @@ export async function createEnvironment() {
 export async function setupRootStore() {
   let rootStore: RootStore
   let data: any
-  let vietnamData : any
+  let onlineSongs : any
 
   // prepare the environment that will be associated with the RootStore.
   const env = await createEnvironment()
@@ -40,13 +40,12 @@ export async function setupRootStore() {
       console.log("Sign in ok")
       const usersRef = firebase.firestore().collection('Music')
       usersRef
-          .doc("VIETNAM")
+          .doc("MusicPlaylist")
           .get()
           .then((data) => {
-            vietnamData = data.data();
+            onlineSongs = data.data().Playlists;
             if (rootStore != null) {
-              rootStore.Playlist.AlbumSongPlaylist.setAlbumName(vietnamData.AlbumName)
-              rootStore.Playlist.AlbumSongPlaylist.setListSongs(vietnamData.Songs)
+              rootStore.Playlist.setListAlbum(onlineSongs)
             }
             else {
               console.log("rootStore is null can not setData")
@@ -66,10 +65,12 @@ export async function setupRootStore() {
     data = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
     rootStore = RootStoreModel.create({
       Playlist: {
-        AlbumSongPlaylist: {
+        AlbumSongPlaylist: [
+          {
           AlbumName:  "", 
           Songs: []
-        }
+          }
+        ]
       },
       Navigation: {
         payload: {

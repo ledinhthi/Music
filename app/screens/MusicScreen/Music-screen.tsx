@@ -18,103 +18,39 @@ const ROOT: ViewStyle = {
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
-// Fake data
-var DATA = [
-  {
-    nameAlbum: "My Songs",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs1",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs2",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs3",
-    sourceImage: ""
-  }
-]
-var SONG_DATA = [
-  {
-    nameSong: "Perfect",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Love you like You Do",
-    nameAuthor: "TaylorSwift",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "LoveYourself",
-    nameAuthor: "Justinbieber",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-  ,
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-  ,
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-]
 
 // Make PlaylistItem
 const PlaylistItem = ({item, navigation}) => {
   // const {width, height} = props;
-  
+  const albumArt = item.AlbumArt;
+  console.log(albumArt)
   return (
     <TouchableOpacity onPress = {() => {
       const imageInfo = {
-         name: item.nameSong,
-         author: item.nameAuthor,
-         duration: item.duration
+         currentAlbum: item.AlbumName,
       }
        navigation.navigate("SongPlaylist", imageInfo)
      // navigation.goBack()
    }}>
-     <View style = {{flex: 1, flexDirection: 'column', width: 150, height: 135, backgroundColor: color.palette.white, borderRadius: 20, marginRight: 20}}>
-        <Text style = {{textAlign:'left', paddingLeft: 10, fontSize: 15, color: color.palette.offWhite, paddingTop: 106 }}>
-            {item.nameAlbum}
+     <View style = {{flex: 1, flexDirection: 'column', width: 150, height: 135, 
+     backgroundColor: color.palette.white, borderRadius: 20, marginRight: 20}}
+     >
+       <Image style = {{flex: 1, resizeMode: 'cover', borderRadius: 20}}
+       source = {{uri: albumArt}}>
+       </Image>
+       <Text style = {{flex: 1, ...StyleSheet.absoluteFillObject,textAlign:'left', paddingLeft: 10, 
+       fontSize: 15, color: color.palette.offWhite, fontWeight:'bold' ,paddingTop: Platform.select({
+         ios: 150,
+         android: 106
+       }) }}>
+            {item.AlbumName}
         </Text>
      </View>
      </TouchableOpacity>
   )
 }
 // Make Song PlaylistFlatList
-const SongListItem = ({item, navigation}) => {
-  
+const SongListItem = ({item, rootStore}) => {
   return (
     <Swipeout style = {{flex : 1 }}  backgroundColor = {color.palette.transparent} right = {[
       {
@@ -123,13 +59,15 @@ const SongListItem = ({item, navigation}) => {
       }
     ]}> 
     <TouchableOpacity onPress = {() => {
-       const imageInfo = {
-          name: item.nameSong,
-          author: item.nameAuthor,
-          duration: item.duration
+       const songInfo = {
+          title: item.title,
+          author: item.author,
+          urlSong: item.urlSong,
+          urlImage: item.urlImage,
+          duration: item.duration,
+          content: item.content
        }
-        navigation.navigate("MusicPlayer", imageInfo)
-      // navigation.goBack()
+       rootStore.Navigation.setPayload(songInfo)
     }}>
  
     <View style = {{flex: 1, flexDirection: 'row', width: widthScreen, height: 60}}>
@@ -168,15 +106,8 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   // Create state
   const [isChoseAlbum, setIsChoseAlbum] = useState(false);
   const [urlChoseAlbum, setUrlChoseAlbum] = useState("");
-  const [vietnamAlbum, setVietNameAlbum] = useState({
-    "AlbumName": "",
-    "Songs": []
-  })
-  // useEffect(() => {
-  //   // get url image from chose Album
-  //   console.log("useEffect")
-  // })
-  // Pull in one of our MST stores
+  const [vietnamAlbum, setVietNameAlbum] = useState([])
+  const [mainSongs, setMainSongs] = useState([])
   const rootStore = useStores();
   
   // console.log(`Store + ${rootStore}`)
@@ -186,14 +117,7 @@ export const MusicScreen: Component = observer(function MusicScreen() {
   const onMenuButton = () => {
     navigation.dispatch(DrawerActions.openDrawer())
   }
-  const fetchSpotifyApi = async () => {
-    try {
-      const data = await fetch("")
-    }
-    catch (error){
-
-    }
-  }
+ 
   // useEffect conbine willmount, did mount, update
   useEffect(() => {
       // get Api
@@ -220,13 +144,21 @@ export const MusicScreen: Component = observer(function MusicScreen() {
       // .catch(error => {
       //   Alert.alert(error)
       // })
-    const vietnamAlbumName = rootStore.Playlist.AlbumSongPlaylist.getAlbumName();
-    const listVietnamSongs = rootStore.Playlist.AlbumSongPlaylist.getListSongs();
-    var vietnamAlbumData = {
-      "AlbumName" : vietnamAlbumName,
-      "Songs": listVietnamSongs
+    // const vietnamAlbumName = rootStore.Playlist.AlbumSongPlaylist[0].getAlbumName();
+    // const listVietnamSongs = rootStore.Playlist.AlbumSongPlaylist[0].getListSongs();
+    // var vietnamAlbumData = {
+    //   "AlbumName" : vietnamAlbumName,
+    //   "Songs": listVietnamSongs
+    // }
+    if (rootStore == null) {
+        console.log("RootStore is null")
     }
-   setVietNameAlbum(vietnamAlbumData)
+    else {
+      const songsPlaylist =  rootStore.Playlist.getListSongAlbum()
+      console.log("songsPlaylist size ", songsPlaylist.length)
+      setVietNameAlbum(songsPlaylist)
+      // set MainSongs
+    }
     
     return () => {
       console.log("on un mount")
@@ -276,15 +208,11 @@ export const MusicScreen: Component = observer(function MusicScreen() {
             style = {{marginTop: 10}}
             bounces = {false}
             horizontal = {true}
-            data = {DATA}
+            data = {vietnamAlbum}
             keyExtractor = {(item) => {
-              return item.nameAlbum
+              return item.AlbumName
             }}
-            //  renderItem = {(data) => {
-            //       return (
-            //           <PlaylistItem props = {{data}}/>
-            //       )
-            //  }}()
+  
           renderItem = {({item}) => (
               <PlaylistItem item = {item} navigation = {navigation}/>
           )}
@@ -301,13 +229,13 @@ export const MusicScreen: Component = observer(function MusicScreen() {
            style = {{flex: 1, marginTop: 10, marginLeft : 10}}
            bounces = {false}
            horizontal = {false}
-           data ={vietnamAlbum.Songs}
+           data ={rootStore.Playlist.getFirstAlbum().Songs}
            renderItem = {({item}) => (
-              <SongListItem item = {item} navigation = {navigation}/>
+              <SongListItem item = {item} rootStore = {rootStore}/>
              )
            }
            keyExtractor = {(item) => {
-            return item.nameSong
+            return item.title
           }}
            />
         </View>

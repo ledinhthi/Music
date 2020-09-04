@@ -1,4 +1,5 @@
 import { Instance, SnapshotOut, types, SnapshotIn } from "mobx-state-tree"
+import { forEach } from "ramda"
 
 /**
  * A RootStore model.
@@ -25,6 +26,7 @@ export const SongModel = types.model("Song", {
 // });
 // Define albumSongs
 export const AlbumSongModel = types.model("AlbumSong", {
+    AlbumArt: types.optional(types.string, ""),
     AlbumName: types.optional(types.string, ""),
     Songs: types.array(SongModel)
 })
@@ -35,6 +37,10 @@ export const AlbumSongModel = types.model("AlbumSong", {
     },
     setListSongs (listSong) {
         self.Songs = listSong
+    },
+    setAlbumArt(albumArt) {
+        console.log(`albumAdrt` + albumArt)
+        self.AlbumArt = albumArt
     }
 }))
 .views(self => ({
@@ -54,39 +60,64 @@ export const AlbumSongModel = types.model("AlbumSong", {
 // })
 // Define Playlists
 export const PlaylistsModel = types.model("PlaylistsModel", {
-    AlbumSongPlaylist:  AlbumSongModel
+    AlbumSongPlaylist:  types.array(AlbumSongModel)
 })
-// navigation
-export const PayloadObject = types.model("Payload", {
-    currentScreen: types.optional(types.string, ""),
-    property: types.optional(types.string, ""),
-    valueProperty: types.optional(types.number, 0)
-}).actions(self => ({
-    setValueProp (value) {
-        self.valueProperty = value;
-    }
-})).views(self => ({
-     get getValueProp () {
-    
-        return self.valueProperty
+.views(self => ({
+    getListSongAlbum() {
+        return self.AlbumSongPlaylist
+    },
+    getFirstAlbum() {
+        return self.AlbumSongPlaylist[0]
+    },
+    getAlbumByName(nameAlbum) {
+        var albumTemp = {};
+        if (self.AlbumSongPlaylist.length > 0) {
+            self.AlbumSongPlaylist.forEach(albumn => {
+                if (albumn.AlbumName == nameAlbum) {
+                    albumTemp = albumn
+                    return;
+                }
+            })
+        }
+        return albumTemp;
     }
 }))
+.actions(self => ({
+    setListAlbum(listAlbum) {
+        self.AlbumSongPlaylist = listAlbum
+    }
+}))
+// navigation
+export const PayloadObject = types.model("Payload", {
+    title: types.optional(types.string, ""),
+    author: types.optional(types.string, ""),
+    urlImage: types.optional(types.string, ""),
+    duration: types.optional(types.number, 0),
+    urlSong: types.optional(types.string, ""),
+    content: types.optional(types.string, "")
+})
 
 export const NavigationModel = types.model("NavigationModel", {
     payload: PayloadObject,
-    isLogin: types.boolean
+    isLogin: types.optional(types.boolean, false)
 }).views(self => {
     return {
         getIsLogin() {
             return self.isLogin
+        },
+        getPayload() {
+            return self.payload
         }
     }
 }).actions(self => {
     return {
         setIsLogin<T>(key: keyof SnapshotIn<typeof self>, value: T) {
             (self[key] as T) = value;
-          
-          }
+        },
+        setPayload(payload) {
+            console.log("payload", payload)
+            self.payload = payload
+        }
     }
 })
 
