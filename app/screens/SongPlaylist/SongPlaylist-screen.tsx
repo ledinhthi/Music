@@ -143,13 +143,13 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
       navigation.goBack()
    }
    return (
-     <Screen style={ROOT} preset="fixed">
+     <Screen style={ROOT} preset="fixed" unsafe = {true}>
        {/* <Text preset="header" tx="HomeScreen" /> */}
        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
        <View style = {styles.container}>
          <View style = {{width: widthDeviceScreen, height: heightDeviceScreen, 
           position: 'absolute'}}> 
-          <Image style= {{flex: 1, marginBottom: heightDeviceScreen * 40 / 100}}
+          <Image style= {{flex: 1, marginBottom: heightDeviceScreen * 42 / 100,resizeMode: 'cover'}}
             source = {{uri: choseAlbumn["AlbumArt"]}}
             >
           </Image>
@@ -189,8 +189,8 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
                   {"My Songs"}
                 </Text>
              </View>
-              <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.white, borderTopLeftRadius: 50}}>
-              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.gray16DP, borderTopLeftRadius: 70}}>
+              <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.gray16DP , borderTopLeftRadius: 80}}>
+              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.black12DP, borderTopLeftRadius: 70}}>
                 <FlatList
                   showsVerticalScrollIndicator = {false}
                   style = {{marginTop: 15, paddingLeft: 30}}

@@ -4,7 +4,7 @@ import { ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackgroun
         TextInput, Image, TouchableOpacity, Keyboard,
         TouchableWithoutFeedback, FlatList, KeyboardAvoidingView,
          RefreshControl, ColorPropType, Alert} from "react-native"
-import { Screen } from "../../components"
+import { Screen, MusicChartAnimation } from "../../components"
 import { useNavigation, DrawerActions } from "@react-navigation/native"
 import { useStores } from "../../models"
 import { color } from "../../theme"
@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/Feather"
 import IconOcticons from "react-native-vector-icons/Octicons"
 import Swipeout from "react-native-swipeout"
 import {firebase} from "../../config/firebase"
+import { boolean } from "mobx-state-tree/dist/internal"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
@@ -23,7 +24,6 @@ const heightScreen = Dimensions.get("screen").height;
 const PlaylistItem = ({item, navigation}) => {
   // const {width, height} = props;
   const albumArt = item.AlbumArt;
-  console.log(albumArt)
   return (
     <TouchableOpacity onPress = {() => {
       const imageInfo = {
@@ -51,6 +51,7 @@ const PlaylistItem = ({item, navigation}) => {
 }
 // Make Song PlaylistFlatList
 const SongListItem = ({item, rootStore}) => {
+  const [isChoseSong, setIsChoseSong] = useState(false);
   return (
     <Swipeout style = {{flex : 1 }}  backgroundColor = {color.palette.transparent} right = {[
       {
@@ -64,9 +65,11 @@ const SongListItem = ({item, rootStore}) => {
           author: item.author,
           urlSong: item.urlSong,
           urlImage: item.urlImage,
+          thumbnail_medium: item.thumbnail_medium,
           duration: item.duration,
           content: item.content
        }
+       setIsChoseSong(true)
        rootStore.Navigation.setPayload(songInfo)
     }}>
  
@@ -78,6 +81,8 @@ const SongListItem = ({item, rootStore}) => {
               source = {{uri: item.urlImage}}
             >
             </Image>
+            <MusicChartAnimation style = {{width: 40, height: 40}} isChose = {isChoseSong}/>
+           
         </View>
         {/* Content */}
         <View style = {{marginLeft: 15, marginRight: 30,
@@ -89,7 +94,7 @@ const SongListItem = ({item, rootStore}) => {
           </Text>
          
           {/* NameAuthor */}
-          <Text style = {[styles.textStyle, {fontSize: 15}]}> 
+          <Text style = {[styles.textStyle, {fontSize: 15, color: color.palette.lightGrey, fontWeight: 'normal'}]}> 
           {item.author}
           </Text>
         </View>
@@ -155,24 +160,23 @@ export const MusicScreen: Component = observer(function MusicScreen() {
     }
     else {
       const songsPlaylist =  rootStore.Playlist.getListSongAlbum()
-      console.log("songsPlaylist size ", songsPlaylist.length)
       setVietNameAlbum(songsPlaylist)
       // set MainSongs
+      console.log("OnMusicScreen" , rootStore.Playlist.getFirstAlbum().Songs)
     }
-    
     return () => {
-      console.log("on un mount")
+      console.log("MusicScreen is unmounted")
     }
   }, [])
  
   return (
-    <Screen style={ROOT} preset="fixed">
+    <Screen style={ROOT} preset="fixed" unsafe = {true}>
       {/* <Text preset="header" tx="HomeScreen" /> */}
       
       <View style = {styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
          {/* 15% for header  */}
-         <KeyboardAvoidingView  style= {{flex:1}} behavior="padding" keyboardVerticalOffset = {-1000}>
+        <KeyboardAvoidingView  style= {{flex:1}}>
         <View style = {styles.header}>
             <View style = {{flexDirection: 'row'}}>
               <TouchableOpacity onPress = {onMenuButton}>
@@ -191,8 +195,8 @@ export const MusicScreen: Component = observer(function MusicScreen() {
                         >
                    </IconOcticons>
                   <TextInput style = {styles.textInputStyle}
-                  placeholder = {"Search Here!!"}
-                  placeholderTextColor = {color.palette.white70Percent}
+                    placeholder = {"Search Here!!"}
+                    placeholderTextColor = {color.palette.white70Percent}
                   >                  
                   </TextInput>
                 </View>  

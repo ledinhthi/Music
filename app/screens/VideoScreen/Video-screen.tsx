@@ -18,9 +18,6 @@ import {firebase} from "../../config/firebase"
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
 }
-const widthScreen = Dimensions.get("screen").width;
-const heightScreen = Dimensions.get("screen").height;
-
 const VideoItem = ({item}) => {
   const [videoId, setVideoId] = useState("")
   const [isShowYoutube, setShowYoutube] = useState(false)
@@ -36,19 +33,19 @@ const VideoItem = ({item}) => {
     { isShowYoutube === false ? <View style = {styles.videoContainer}>
       <View style = {{flex : 1}}>
         <Image style = {{
-          height: heightDeviceScreen * 15 / 100, zIndex : 10,   width: widthDeviceScreen * 40 /100,  resizeMode: 'cover'}} 
+          height: heightDeviceScreen * 15 / 100, zIndex : 10,  width: widthDeviceScreen * 45 /100}} 
           source = {{uri: urlImage}}
         > 
         </Image>
       </View>
       <View style = {styles.titleContainer}>
-        <Text style = {styles.textStyle}
+        <Text style = {[styles.textStyle, {fontWeight: "400"}]}
         numberOfLines = {2}
         ellipsizeMode = "tail"
         >
               {title}
         </Text>
-        <Text style = {styles.textStyle}
+        <Text style = {[styles.textStyle, {color: color.palette.lightGrey}]}
          numberOfLines = {2}
          ellipsizeMode = "tail">
               {description}
@@ -161,7 +158,7 @@ export const VideoScreen: Component = observer(function VideoScreen() {
             </IconOcticons>
             <TextInput ref = {textInputRef}
             inlineImageLeft='search_icon' style = {styles.textInputStyle}
-             placeholder = {"Search Here!!"}
+             placeholder = {" Tìm kiếm "}
              placeholderTextColor = {color.palette.white70Percent}
              onChangeText = {onChangeText}
              onSubmitEditing = {onSubmit}
@@ -192,11 +189,12 @@ const styles = StyleSheet.create({
       marginLeft: 10
     },
     videoContainer: {
-      width: widthDeviceScreen,
+      flex: 1,
+      // backgroundColor: 'white',
       height: heightDeviceScreen * 15 / 100,
       flexDirection :'row',
+      justifyContent: 'flex-start'
     },
- 
     titleContainer: {
       flex: 1,
       flexDirection: 'column',
@@ -227,7 +225,6 @@ const styles = StyleSheet.create({
     justifyContent : 'center'
   },
   content : {
-    flex : 0.9,
-    // marginTop: 10
+    flex : 1
   },
 })

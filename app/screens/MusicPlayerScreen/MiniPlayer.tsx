@@ -13,7 +13,8 @@ import {IconAwesome, IconEntypo, IconFeather,
 
 export interface playerInfor {
     isPlayingState? : boolean,
-    processPlayState?: any
+    processPlayState?: any,
+    trackInfo?: any
 }
 export const MiniPlayer : Component =  observer(function MiniPlayer (prop : playerInfor) {
 
@@ -37,19 +38,20 @@ export const MiniPlayer : Component =  observer(function MiniPlayer (prop : play
                       <IconAwesome name = {"heart"} size = {30} color = {favoriteColor ? color.palette.orange : color.palette.offWhite} />
                 </TouchableOpacity> */}
                 <View style = {{width:  50 , height : 50,  borderRadius: 25, backgroundColor: color.palette.offWhite }}>
-                    
+                    <Image style = {{flex: 1, resizeMode: 'cover', borderRadius: 25}}
+                    source = {{uri: prop.trackInfo["urlImage"]}}>
+                    </Image>
                 </View>
-               
                 </View>
                 {/* Content */}
                 <View style = {styles.textContent}>
                     {/*  Song */}
                       <Text style = {[styles.textStyle, {fontWeight: '900', marginBottom: 2}]}>
-                            Love you like you do
+                            {prop.trackInfo["title"]}
                       </Text>
                       {/* Author */}
                       <Text style = {[styles.textStyle, {fontSize: 15, color: color.palette.white70Percent}]}> 
-                            Sharaha
+                           {prop.trackInfo["author"]}
                       </Text>
                 </View>
                 <View style = {styles.playerButton}>

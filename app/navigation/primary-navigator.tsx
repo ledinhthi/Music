@@ -93,9 +93,12 @@ export function Player(props) {
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
        screenOptions = {{
-        headerShown : false,
-        
+        headerShown : false,  
+        cardStyle : {
+          backgroundColor: 'transparent'
+        }
       }}
+      
     >
       <ContainerPlayerStack.Screen 
       name= "player">
@@ -103,7 +106,6 @@ export function Player(props) {
          const test = {
            lastPosition: lastPosition
          }
-     
          return (
             <MusicPlayerScreen {...test}>
             </MusicPlayerScreen>
@@ -286,7 +288,6 @@ export function PrimaryNavigator() {
         {
           title: "Playlists",
           drawerIcon: ({focused, size}) => {
-            console.log(`focused + ${focused}`)
             return (
             <IconMaterial name = "playlist-music" size = {25} color =  {focused ? "#00BFFF" : "#808080"}/>
             )

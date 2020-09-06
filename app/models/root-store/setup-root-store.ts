@@ -37,7 +37,6 @@ export async function setupRootStore() {
   const firestore = firebase.auth()
   .signInWithEmailAndPassword("ledinhthi11@gmail.com", "dananhchi1")
   .then((response) => {
-      console.log("Sign in ok")
       const usersRef = firebase.firestore().collection('Music')
       usersRef
           .doc("MusicPlaylist")

@@ -2,7 +2,7 @@ import React,{useState, useRef, FunctionComponent as Component, useEffect, React
 import { observer } from "mobx-react-lite"
 import { Animated, ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackground,
   TextInput, Image, TouchableOpacity, Keyboard,
-  TouchableWithoutFeedback, FlatList, PanResponder, Slider, Share, Alert} from "react-native"
+  TouchableWithoutFeedback, FlatList, PanResponder, Slider, Share, Alert, AsyncStorage} from "react-native"
 import { Screen, Button } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -16,15 +16,17 @@ import IconEntypo from "react-native-vector-icons/Entypo"
 import * as ProgressBar from "react-native-progress"
 import { transform } from "@babel/core"
 import { MiniPlayer } from "./MiniPlayer"
-import { widthDeviceScreen } from "../../utils/common/definition"
+import { widthDeviceScreen, heightDeviceScreen } from "../../utils/common/definition"
 import TrackPlayer, { STATE_PLAYING, ProgressComponent, STATE_BUFFERING} from "react-native-track-player";
 import { TraceMode } from "mobx/lib/internal"
 import { State } from "react-powerplug"
 import Video from 'react-native-video'
+import { onSnapshot } from "mobx-state-tree"
+import * as storage from "../../utils/storage"
 
 const ROOT: ViewStyle = {
-  backgroundColor: color.palette.black12DP,
-
+  flex: 1,
+  // backgroundColor: "transparent",
   borderTopLeftRadius: 15,
   borderTopRightRadius: 15,
 }
@@ -43,7 +45,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
   // OR
-  async function setup(trackInfo) {
+  async function setup() {
     await TrackPlayer.setupPlayer({});
     await TrackPlayer.updateOptions({
       stopWithApp: true,
@@ -52,22 +54,14 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
         TrackPlayer.CAPABILITY_PAUSE,
         TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
         TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-        TrackPlayer.CAPABILITY_STOP
+        TrackPlayer.CAPABILITY_STOP,
       ],
       compactCapabilities: [
         TrackPlayer.CAPABILITY_PLAY,
         TrackPlayer.CAPABILITY_PAUSE
       ]
     });
-    var data : string = trackInfo["urlSong"]
-    await TrackPlayer.add({
-      id: 'trackId',
-      url: "https://mp3-s1-zmp3.zadn.vn/276ef4b7d0f039ae60e1/3055462972925438680?authen=exp=1599314241~acl=/276ef4b7d0f039ae60e1/*~hmac=b6bb23d54bed259aed93f2f197e338a6",
-      title: trackInfo["title"],
-      artist: trackInfo["author"],
-      artwork: trackInfo["urlImage"],
-      duration: trackInfo["duration"]
-    });
+   
   }
   
   const rootStore = useStores()
@@ -161,26 +155,67 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
     })
   ).current;
   // UseEffect
+  async function setSongToTrackPlayer(trackInfo) {
+      await TrackPlayer.add({
+        id: 'trackId',
+        url: trackInfo["urlSong"],
+        title: trackInfo["title"],
+        artist: trackInfo["author"],
+        artwork: trackInfo["urlImage"],
+        duration: trackInfo["duration"]
+      })
+  }
+  // saveCurrentTrack to asynchorous
+  const storageCurrentSong = async (TrackInfo) => {
+      // await AsyncStorage.setItem("CurrentSong", TrackInfo, (storageStatus) => {
+      //     console.log(`storageStatus` + storageStatus)
+      // })
+  }
+  const getCurrentSongFromStorage = async () => {
+    // if (AsyncStorage.getAllKeys.length > 0) {
+    //   const track = await storage.getItem("CurrentSong", ((error, result) => {
+    //       console.log(`Error: `, error, "Result:", result)
+    //   }));
+    //   setTrackInfo(track)
+    // }
+  }
+  onSnapshot(rootStore.Navigation, (data) => {
+    if (rootStore != null) {
+      TrackPlayer.reset()
+      const trackInfoTemp = data.payload
+      console.log("data.payload", data.payload, "trackInfo title", trackInfo["title"], "trackInfoTemp.title", trackInfoTemp.title)
+      if (trackInfo["title"] != trackInfoTemp.title) {
+        storage.save("LastPlayedSong", trackInfoTemp).then((res) => {
+          console.log("Done save To Async")
+        }).catch((error) => {
+          console.log("Error save To Async")
+        })
+      }
+      else {
+        console.log("Same Song")
+      }
+      setTrackInfo(trackInfoTemp)
+      setSongToTrackPlayer(trackInfoTemp)
+    }
+  })
   useEffect(() => {
     //Set up track player
-    const trackInforTemp = rootStore.Navigation.getPayload()
-    console.log("trackInfor", trackInforTemp.urlSong)
-    setTrackInfo(trackInforTemp);
-    setSongUrl(trackInforTemp.urlSong)
-    setup(trackInforTemp)
-    // TrackPlayer.getDuration().then((duration) => {
-    //   setDuration(duration)
-    //   // 0.980392156862745
-    //   console.log(`Current duration + ${duration}`)
-    // })
-    // TrackPlayer.getPosition().then((position) => {
-    //   // setDuration(duration)
-    //   // 0.980392156862745
-    //   console.log(`position + ${position}`)
-    // })
-   
-  
+    setup()
+    // getCurrentSong
+    storage.load("LastPlayedSong").then((lastSong) => {
+      console.log("lastsong", lastSong)
+      setTrackInfo(lastSong)
+      setSongToTrackPlayer(lastSong)
+    }).catch((error) => {
+      console.log("error", error)
+    })
+    // getCurrentSongFromStorage().then(() => {
+    //   setSongToTrackPlayer(trackInfo)
+    // }).catch((error) => {
+    //   console.log(`Error`)
+    // });
     return () => {
+   
       console.log(`Unmounted MusicPlayer-screen`)
       pan.removeAllListeners()
     }
@@ -191,16 +226,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
      sliderPosition.setValue(props.lastPosition);
   }, [props.lastPosition])
 
-
   // Player 
   const processPlayState = () => {
-    let playState = "";
     TrackPlayer.getState().then((state) => {
-        console.log(`State + ${state}`)
-       
-        console.log(`State + ${playState} +  STATE_PLAYING + ${STATE_PLAYING}`)
         if (state == STATE_PLAYING) {
-          console.log(`Playstate`)
            onPause().then(() => {
              setPlayingState(true)
            })
@@ -233,17 +262,20 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
       await TrackPlayer.play();
   }
   return (
-    <Screen style={ROOT} preset="fixed">
+    <View style={ROOT} >
             {/* Image backgorund */}
-        <View style = {styles.container}>
+        <Image style = {{width: widthDeviceScreen, height: heightDeviceScreen * 80 / 100, borderTopLeftRadius: 20, borderTopRightRadius: 20}}
+            source = {{uri: trackInfo["thumbnail_medium"] ? trackInfo["thumbnail_medium"] : "https://photo-resize-zmp3.zadn.vn/w165_r1x1_jpeg/cover/0/1/4/7/01477521b69e1921bafe110a878aafdc.jpg"}}>
+        </Image>
+        <View style = {[styles.container, {...StyleSheet.absoluteFillObject}]}>
           <TouchableOpacity style = {{flex : 1}} onPress = {() => {
             console.log("OnPress on miniPlayer")
           }}>
-          <Animated.View style = {{flex :1, opacity: opacitySlider}}>
-          
+          <Animated.View style = {{flex :1, ...StyleSheet.absoluteFillObject, opacity: opacitySlider}}>
           <MiniPlayer   
           {...{isPlayingState : isPlayingState,
-               processPlayState: processPlayState}}>
+               processPlayState: processPlayState,
+               trackInfo: trackInfo}}>
           </MiniPlayer>
           </Animated.View>
           </TouchableOpacity>
@@ -277,7 +309,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                     {/* Image */}
                     <View style = {{width: 50 , height : 50, borderRadius: 25, backgroundColor: color.palette.white}}>
                     <Image style = {{width : 50, height: 50, borderRadius: 50/2,  resizeMode: 'cover'}}
-                        source = {{uri: trackInfo["urlImage"]}}
+                        source = {{uri: trackInfo["urlImage"] ? trackInfo["urlImage"] : "https://photo-resize-zmp3.zadn.vn/w165_r1x1_jpeg/cover/0/1/4/7/01477521b69e1921bafe110a878aafdc.jpg"}}
                       >
                     </Image>
                     </View>
@@ -312,14 +344,15 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
                 {/* Progressbar */}
                 <View style = {{flex: 2, flexDirection:'column', justifyContent: 'center'}}>
                     {/* Progresss */}
-                    <View style = {{ height: 3 , backgroundColor: 'white', margin: 20}}  >
+                    <View style = {{ height: 3 , backgroundColor: color.palette.white70Percent, margin: 20}}  >
+                    {/* Progressbar line color */}
+                    <View style = {{flex: 1, backgroundColor: "#00AAE4" }}/>
+
                     <Animated.View  style = {[{flex: 1}, {transform: [{translateX: pan}]}]}
                        {...panResponder.panHandlers} 
                     > 
-                  
                     <View style = {{width: 10, height: 10, position: 'absolute', top: -4, zIndex: 2,
                       borderRadius: 5, backgroundColor: 'white'}}>
-                  
                     </View>
                     </Animated.View>
                       {/* </Animated.View> */}
@@ -379,20 +412,17 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
             </View>
           </View>          
         </View>
-    </Screen>
+    </View>
   )
 })
 const styles = StyleSheet.create({
   container : {
      flex: 1,
      borderTopLeftRadius: 15,
-     borderTopRightRadius: 15
+     borderTopRightRadius: 15,
   },
   header : {
     flex : 1.5,
-    color: 'red',
-    alignItems: 'flex-start',
-    justifyContent: 'center'
   },
   playerArea : {
     flex: 8.5,
@@ -421,6 +451,7 @@ const styles = StyleSheet.create({
      color: color.palette.offWhite,
      fontSize: 30,
      fontWeight: '800',
+     alignItems: 'center'
   },
 
   playlistStyle: {

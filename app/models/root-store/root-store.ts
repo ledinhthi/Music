@@ -13,6 +13,7 @@ export const SongModel = types.model("Song", {
     title: types.optional(types.string, ""),
     author: types.optional(types.string, ""),
     urlImage: types.optional(types.string, ""),
+    thumbnail_medium: types.optional(types.string, ""),
     duration: types.optional(types.number, 0),
     urlSong: types.optional(types.string, ""),
     content: types.optional(types.string, "")
@@ -32,24 +33,20 @@ export const AlbumSongModel = types.model("AlbumSong", {
 })
 .actions(self => ({
     setAlbumName (albumName) {
-        console.log(`AlbumName` + albumName)
         self.AlbumName = albumName
     },
     setListSongs (listSong) {
         self.Songs = listSong
     },
     setAlbumArt(albumArt) {
-        console.log(`albumAdrt` + albumArt)
         self.AlbumArt = albumArt
     }
 }))
 .views(self => ({
      getAlbumName () {
-        console.log("self.AlbumName" + self.AlbumName)
         return self.AlbumName;
      },
      getListSongs () {
-        console.log("NumberOf songs" + self.Songs.length)
         return self.Songs;
      }
 }))
@@ -87,18 +84,9 @@ export const PlaylistsModel = types.model("PlaylistsModel", {
         self.AlbumSongPlaylist = listAlbum
     }
 }))
-// navigation
-export const PayloadObject = types.model("Payload", {
-    title: types.optional(types.string, ""),
-    author: types.optional(types.string, ""),
-    urlImage: types.optional(types.string, ""),
-    duration: types.optional(types.number, 0),
-    urlSong: types.optional(types.string, ""),
-    content: types.optional(types.string, "")
-})
 
 export const NavigationModel = types.model("NavigationModel", {
-    payload: PayloadObject,
+    payload: SongModel,
     isLogin: types.optional(types.boolean, false)
 }).views(self => {
     return {
@@ -107,7 +95,7 @@ export const NavigationModel = types.model("NavigationModel", {
         },
         getPayload() {
             return self.payload
-        }
+        },
     }
 }).actions(self => {
     return {
@@ -115,9 +103,8 @@ export const NavigationModel = types.model("NavigationModel", {
             (self[key] as T) = value;
         },
         setPayload(payload) {
-            console.log("payload", payload)
             self.payload = payload
-        }
+        },
     }
 })
 

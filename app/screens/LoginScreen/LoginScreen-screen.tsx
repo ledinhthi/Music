@@ -1,6 +1,6 @@
 import React, { FunctionComponent as Component } from "react"
 import { observer } from "mobx-react-lite"
-import { ViewStyle, View, Dimensions, Image, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from "react-native"
+import { ViewStyle, View, Dimensions, Image, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, TextInput } from "react-native"
 import { Screen, Text, TextField, Button } from "../../components"
 // import { useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
@@ -35,14 +35,16 @@ export const LoginScreen: Component = observer(function LoginScreen() {
 
            source = {require("../../../assets/images/song.png")}>
         </Image> 
-        <TextField style = {{width: widthDeviceScreen * 70 / 100, height: heightDeviceScreen * 15 / 100, marginLeft: widthDeviceScreen * 15 / 100
-        , marginRight: widthDeviceScreen * 15 / 100, marginTop: heightDeviceScreen* 7 / 100}} labelTx = {"Username"} inputStyle = {{color: color.palette.offWhite }} />
-        <TextField style = {{width: widthDeviceScreen * 70 / 100, height: heightDeviceScreen * 15 / 100, marginLeft: widthDeviceScreen * 15 / 100
-        , marginRight: widthDeviceScreen * 15 / 100, marginTop: -heightDeviceScreen* 7/ 100}} labelTx = {"Password"} inputStyle = {{color: color.palette.offWhite }}
-        secureTextEntry = {true}
+        <TextInput style = {{width: widthDeviceScreen * 70 / 100, height: heightDeviceScreen * 6 / 100, marginLeft: widthDeviceScreen * 15 / 100, borderRadius: 20
+        , marginRight: widthDeviceScreen * 15 / 100, paddingLeft: 10, marginTop: heightDeviceScreen* 7 / 100, backgroundColor: color.palette.gray16DP, color: color.palette.offWhite,
+        }} placeholder = {"Username"}  placeholderTextColor = {color.palette.lighterGrey}
+         />
+        <TextInput style = {{width: widthDeviceScreen * 70 / 100, height: heightDeviceScreen * 6 / 100, marginLeft: widthDeviceScreen * 15 / 100, borderRadius: 20
+        , marginRight: widthDeviceScreen * 15 / 100, paddingLeft: 10, marginTop: heightDeviceScreen* 3/ 100, backgroundColor: color.palette.gray16DP, color: color.palette.offWhite}} 
+        secureTextEntry = {true} placeholder = {"Password"} placeholderTextColor = {color.palette.lighterGrey} 
         />
-        <Button textStyle = {{color: color.palette.offWhite, fontSize : 18}} text = {"Đăng nhập"} style = {{width: widthDeviceScreen * 40 / 100, height: heightDeviceScreen * 7 / 100, 
-           backgroundColor: "blue", marginTop: -heightDeviceScreen* 3/ 100, alignSelf: 'center', borderRadius: 20}}
+        <Button textStyle = {{color: color.palette.purple, fontSize : 18}} text = {"Đăng nhập"} style = {{width: widthDeviceScreen * 40 / 100, height: heightDeviceScreen * 6 / 100, 
+           backgroundColor: "blue", marginTop: heightDeviceScreen* 4 / 100, alignSelf: 'center', borderRadius: 20}}
            onPress = {() => {
               if (rootStore != null) {
                 rootStore.Navigation.setIsLogin("isLogin", true)
