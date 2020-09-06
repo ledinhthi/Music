@@ -38,6 +38,7 @@ export const TextField: Component<TextFieldProps> = props => {
     placeholder,
     labelTx,
     label,
+    secureTextEntry,
     preset = "default",
     style: styleOverride,
     inputStyle: inputStyleOverride,
@@ -55,12 +56,14 @@ export const TextField: Component<TextFieldProps> = props => {
     <View style={containerStyle}>
       <Text preset="fieldLabel" tx={labelTx} text={label} />
       <TextInput
+        secureTextEntry = {secureTextEntry}
         placeholder={actualPlaceholder}
         placeholderTextColor={color.palette.lighterGrey}
         underlineColorAndroid={color.transparent}
         {...rest}
         style={inputStyle}
         ref={forwardedRef}
+        
       />
     </View>
   )

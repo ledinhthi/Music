@@ -1,0 +1,27 @@
+rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+
+
+Step1: create acount on dashboard and get API here with this link
+: https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow
+
+// Then
+
+ https://accounts.spotify.com/vi-VN/authorize?client_id=cad9d5191eba42d7b4fbb0f77b020dfc&redirect_uri=https:%2F%2Fexample.com%2Fcallback&scope=user-read-private%20user-read-email&response_type=token&state=123
+
+
+step2:
+
+https://example.com/callback#access_token=BQBnes99bg_jp2AUOGLYFyD6I76O2hHuFmS5SxmNiBYgp9UT6mc1-CGOYe7vRSX15Gjxut3-Cwh9LBV-w6BKERgMGUdfgAT_mdldlni5FTlTCQ5drw5Su_mXCe1a-s0m4er0U5U7zRHfwQbTBJYSzGBpznctxZnIqOyZr0_LEGNpbt0&token_type=Bearer&expires_in=3600&state=123
+
+
+
+accesstoken = BQBnes99bg_jp2AUOGLYFyD6I76O2hHuFmS5SxmNiBYgp9UT6mc1-CGOYe7vRSX15Gjxut3-Cwh9LBV-w6BKERgMGUdfgAT_mdldlni5FTlTCQ5drw5Su_mXCe1a-s0m4er0U5U7zRHfwQbTBJYSzGBpznctxZnIqOyZr0_LEGNpbt0
+
+expires_in 3600
+
+
+https://example.com/callback#access_token=BQDvzdm8iMDg0afqwvPldyBQpJta4HgLGHPs0lECUoDRu7L-TEcGT_g55FXn9k2OOt9-0X9Sk_MM8YlDigq8ljrHCqYz5XLMzxDssyEU_8oZHPxNkdq8UYbTsDFU_qTsTUK2DR9LeYjrb_KI4E-jaAT9r6xsXJ1sT6HBO0L1JLe3r7E&token_type=Bearer&expires_in=3600&state=123
+
+
+curl -X "GET" "https://api.spotify.com/v1/tracks/cad9d5191eba42d7b4fbb0f77b020dfc" -H "Accept: application/json" -H "Content-Type: application/json" -H "Authorization: Bearer BQCJxdiubpFcG481Fa98aImtd-vfavbEdhnJcWYorrzvd7Y_rygF50q4gdZaAiY5pm9VikTFP3NH-34aIDlTYh5mqCgb2APepoW5FreZilOXamienQlXZ2DBDSbB4lUkHevHxqVPXDO3CNxAhbxaulsGz11ULIOSFjPZNPfQ55z3FT0"

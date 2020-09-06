@@ -49,9 +49,6 @@ PODS:
     - boost-for-react-native
     - DoubleConversion
     - glog
-  - GCDWebServer (3.5.4):
-    - GCDWebServer/Core (= 3.5.4)
-  - GCDWebServer/Core (3.5.4)
   - glog (0.3.5)
   - GoogleAppMeasurement (6.7.2):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
@@ -258,10 +255,12 @@ PODS:
     - React
   - react-native-splash-screen (3.2.0):
     - React
-  - react-native-video (5.1.0-alpha7):
+  - react-native-track-player (1.2.3):
     - React
-    - react-native-video/Video (= 5.1.0-alpha7)
-  - react-native-video/Video (5.1.0-alpha7):
+  - react-native-video (5.1.0-alpha8):
+    - React
+    - react-native-video/Video (= 5.1.0-alpha8)
+  - react-native-video/Video (5.1.0-alpha8):
     - React
   - react-native-webview (10.3.3):
     - React
@@ -300,9 +299,6 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
-  - RealmJS (6.0.3):
-    - GCDWebServer
-    - React
   - RNCAsyncStorage (1.11.0):
     - React
   - RNCMaskedView (0.1.5):
@@ -354,6 +350,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-track-player (from `../node_modules/react-native-track-player`)
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -367,7 +364,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RealmJS (from `../node_modules/realm`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
@@ -390,7 +386,6 @@ SPEC REPOS:
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseInstallations
-    - GCDWebServer
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleUtilities
@@ -435,6 +430,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-track-player:
+    :path: "../node_modules/react-native-track-player"
   react-native-video:
     :path: "../node_modules/react-native-video"
   react-native-webview:
@@ -459,8 +456,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RealmJS:
-    :path: "../node_modules/realm"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
@@ -497,7 +492,6 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnostics: 7535fe695737f8c5b350584292a70b7f8ff0357b
   FirebaseInstallations: 45f9d44d3a8d6f780fa337ee8987dad87210fcbc
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
-  GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
   GoogleAppMeasurement: 3def7652b1f5b5a576178dc332e2a36a260fbef6
   GoogleDataTransport: 672fb0ce96fe7f7f31d43672fca62ad2c9c86f7b
@@ -517,7 +511,8 @@ SPEC CHECKSUMS:
   react-native-netinfo: 7f3f3ed9e8f0e7ab3e7cac00cbfdc6997e25ecaf
   react-native-safe-area-context: 8260e5157617df4b72865f44006797f895b2ada7
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-video: 184f7d5107582e7def6dafdd3ddc0f795dc33f6a
+  react-native-track-player: 84552605df7d90e199ff8b5deceddff58d658523
+  react-native-video: 8d97379f3c2322a569f1e27542ad1a646cad9444
   react-native-webview: 9c0e18449cd46f652f255a8ac5f911195127b8ca
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
@@ -529,7 +524,6 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  RealmJS: 1535446236bae0818d84188bc1a5fa2f3b9f13fa
   RNCAsyncStorage: db711e29e5e0500d9bd21aa0c2e397efa45302b1
   RNCMaskedView: c8b53164b85ecf94c9a44d67082df0f03c1f74cc
   RNFirebase: 37daa9a346d070f9f6ee1f3b4aaf4c8e3b1d5d1c
@@ -543,6 +537,6 @@ SPEC CHECKSUMS:
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 54d4f4bf88895de7b48fb2b68a6b078eb613cef8
+PODFILE CHECKSUM: 88e8401f1f0b637d1197bd40916689a5fc6c178e
 
 COCOAPODS: 1.9.3

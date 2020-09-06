@@ -2,7 +2,8 @@ import { onSnapshot } from "mobx-state-tree"
 import { RootStoreModel, RootStore, State } from "./root-store"
 import { Environment } from "../environment"
 import * as storage from "../../utils/storage"
-
+import {firebase} from "../../config/firebase"
+import { Alert } from "react-native"
 
 /**
  * The key we'll be saving our state as within async storage.
@@ -28,35 +29,56 @@ export async function createEnvironment() {
 export async function setupRootStore() {
   let rootStore: RootStore
   let data: any
+  let onlineSongs : any
 
   // prepare the environment that will be associated with the RootStore.
   const env = await createEnvironment()
+  // init db 
+  const firestore = firebase.auth()
+  .signInWithEmailAndPassword("ledinhthi11@gmail.com", "dananhchi1")
+  .then((response) => {
+      const usersRef = firebase.firestore().collection('Music')
+      usersRef
+          .doc("MusicPlaylist")
+          .get()
+          .then((data) => {
+            onlineSongs = data.data().Playlists;
+            if (rootStore != null) {
+              rootStore.Playlist.setListAlbum(onlineSongs)
+            }
+            else {
+              console.log("rootStore is null can not setData")
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+  })
+  .catch((Error) => {
+      Alert.alert("Signin Error")
+  })
+
+
   try {
     // load data from storage
     data = (await storage.load(ROOT_STATE_STORAGE_KEY)) || {}
-    console.log(`Data: ${data}`)
-    
     rootStore = RootStoreModel.create({
       Playlist: {
-        AlbumSongPlaylist: {
-          NameAlbumSong: "Vk iu",
-          AlbumSong: [
-            {
-              NameSong: "123",
-              NameAuthor: "ThiHa",
-              isPlaying: false
-            }
-          ]
-
-        },
-        AlbumVideoPlaylist: {
-          NameAlbumVideo: "Vk iu video"
-        }
+        AlbumSongPlaylist: [
+          {
+          AlbumName:  "", 
+          Songs: []
+          }
+        ]
       },
       Navigation: {
         payload: {
           valueProperty: 0
-        }
+        },
+        isLogin: false
+      },
+      Database: {
+        firestore: firestore
       }
     })
   } catch (e) {
