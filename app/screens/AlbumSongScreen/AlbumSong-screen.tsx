@@ -24,7 +24,7 @@ export const AlbumSongScreen: Component = observer(function AlbumSongScreen() {
   // console.log(`Store + ${rootStore}`)
   // Pull in navigation via hook
   const navigation = useNavigation();
-  console.log(`navigation + ${navigation}`)
+
   return (
     <Screen style={ROOT} preset="fixed">
       {/* <Text preset="header" tx="HomeScreen" /> */}

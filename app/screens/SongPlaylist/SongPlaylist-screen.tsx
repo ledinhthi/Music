@@ -4,79 +4,23 @@ import { ViewStyle, Text, View, StyleSheet, Dimensions, Platform, ImageBackgroun
   TextInput, Image, TouchableOpacity, Keyboard,
   TouchableWithoutFeedback, FlatList, StatusBar, PanResponder, Animated} from "react-native"
 import { Screen, Button } from "../../components"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { useStores } from "../../models"
 import { color } from "../../theme"
 import Icon from "react-native-vector-icons/Feather"
 import IconIonicons from "react-native-vector-icons/Ionicons"
 import IconOcticons from "react-native-vector-icons/Octicons"
 import { MusicPlayerScreen } from "../MusicPlayerScreen/MusicPlayer-screen"
-import { NONE } from "apisauce"
 import Swipeout from "react-native-swipeout"
+import { widthDeviceScreen, heightDeviceScreen } from "../../utils/common/definition"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
 }
 const widthScreen = Dimensions.get("screen").width;
 const heightScreen = Dimensions.get("screen").height;
-//
-var SONG_DATA = [
-  {
-    nameSong: "Perfect",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Love you like You Do",
-    nameAuthor: "TaylorSwift",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "LoveYourself",
-    nameAuthor: "Justinbieber",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  },
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-  ,
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-  ,
-  {
-    nameSong: "Photograph",
-    nameAuthor: "Edsheeran",
-    UrlImage: "",
-    Duration: 100
-  }
-]
-
 // Make Song PlaylistFlatList
 const SongListItem = ({item, navigation}) => {
-  console.log(`${navigation}`)
-
   return (
     <Swipeout style = {{flex : 1}} backgroundColor = {color.palette.transparent}
     right = {
@@ -89,20 +33,18 @@ const SongListItem = ({item, navigation}) => {
    > 
     <TouchableOpacity onPress = {() => {
        const imageInfo = {
-          name: item.nameSong,
-          author: item.nameAuthor,
+          name: item.title,
+          author: item.author,
           duration: item.duration
        }
        navigation.push("MusicPlayer", imageInfo)
-        // navigation.navigate("MusicPlayer", imageInfo)
-      // navigation.goBack()
     }}>
  
     <View style = {{flex: 1, flexDirection: 'row', width: widthScreen, height: 60}}>
         {/* Image */}
         <View style = {{width: 50, height: 50, backgroundColor: color.palette.white, borderRadius: 25}}>
             <Image style = {{width : 50, height: 50, borderRadius: 50/2,  resizeMode: 'cover'}}
-              source = {{uri: "https://m.media-amazon.com/images/M/MV5BMGU5YTRjMTUtZDU4Mi00NjFlLWExYTAtMjVkN2JmOTE1Y2Q2XkEyXkFqcGdeQXVyNjE0ODc0MDc@._V1_UY268_CR43,0,182,268_AL_.jpg"}}
+              source = {{uri: item.urlImage}}
             >
             </Image>
         </View>
@@ -112,12 +54,11 @@ const SongListItem = ({item, navigation}) => {
          }}>
           {/* Namssong */}
           <Text style = {[styles.textStyle, {fontSize: 15}]}>
-            {item.nameSong}
+            {item.title}
           </Text>
-         
           {/* NameAuthor */}
           <Text style = {[styles.textStyle, {fontSize: 15}]}> 
-          {item.nameAuthor}
+          {item.author}
           </Text>
         </View>
         {/* Duration */}
@@ -132,7 +73,7 @@ const SongListItem = ({item, navigation}) => {
 export const SongPlaylistScreen: Component = observer(function SongPlaylistScreen() {
    // Create state
    const [isChoseAlbum, setIsChoseAlbum] = useState(false);
-   const [urlChoseAlbum, setUrlChoseAlbum] = useState("");
+   const [choseAlbumn, setChoseAlbumn] = useState({});
     // slider
     const slider = useRef(new Animated.Value(0)).current
   
@@ -186,22 +127,33 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
     ).current;
    // Pull in one of our MST stores
    const rootStore = useStores();
-  //  const {}  = useStores();
-   // console.log(`Store + ${rootStore}`)
-   // Pull in navigation via hook
    const navigation = useNavigation();
+   const params = useRoute().params;
    useEffect(()=> {
-     console.log(`screenWidth + ${widthScreen} + heightScreen + ${heightScreen}`)
-   })
+    console.log("route", params["currentAlbum"])
+    if (rootStore != null){
+      let currentAlbum = rootStore.Playlist.getAlbumByName(params["currentAlbum"]);
+      setChoseAlbumn(currentAlbum)
+    }
+    return () => {
+      console.log(`Unmount songplaylist`)
+    }
+   }, [])
    function onBackButton() {
-
       navigation.goBack()
    }
    return (
-     <Screen style={ROOT} preset="fixed">
+     <Screen style={ROOT} preset="fixed" unsafe = {true}>
        {/* <Text preset="header" tx="HomeScreen" /> */}
        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
        <View style = {styles.container}>
+         <View style = {{width: widthDeviceScreen, height: heightDeviceScreen, 
+          position: 'absolute'}}> 
+          <Image style= {{flex: 1, marginBottom: heightDeviceScreen * 42 / 100,resizeMode: 'cover'}}
+            source = {{uri: choseAlbumn["AlbumArt"]}}
+            >
+          </Image>
+       </View>
        <View style = {[styles.header, {margin: 10}]}>
             <View style = {{flexDirection: 'row'}}>
               <TouchableOpacity onPress = {onBackButton}>
@@ -231,26 +183,26 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
              {/* Name Album song */}
               <View>
                 <Text style = {[styles.textStyle, {marginLeft: 10, translateY: 90}]}> 
-                  {"My Songs"}
+                  {choseAlbumn["AlbumName"]}
                 </Text>
                 <Text style = {[styles.textStyle, {marginLeft: 10, translateY: 96, fontSize: 15}]}> 
                   {"My Songs"}
                 </Text>
              </View>
-              <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.white, borderTopLeftRadius: 50}}>
-              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.gray16DP, borderTopLeftRadius: 70}}>
+              <View style = {{flex: 1, marginTop: 150, backgroundColor: color.palette.gray16DP , borderTopLeftRadius: 80}}>
+              <View style = {{flex: 1, marginTop: 35, backgroundColor: color.palette.black12DP, borderTopLeftRadius: 70}}>
                 <FlatList
                   showsVerticalScrollIndicator = {false}
                   style = {{marginTop: 15, paddingLeft: 30}}
                   bounces = {false}
                   horizontal = {false}
-                  data ={SONG_DATA}
+                  data ={choseAlbumn["Songs"]}
                   renderItem = {({item}) => (
                       <SongListItem item = {item} navigation = {navigation}/>
                     )
                   }
                   keyExtractor = {(item) => {
-                    return item.nameSong
+                    return item.title
                   }}
                 />
               </View>
@@ -280,7 +232,6 @@ export const SongPlaylistScreen: Component = observer(function SongPlaylistScree
 const styles = StyleSheet.create({
   container : {
      flex: 1,
- 
   },
   header : {
     flex : 1.5,
@@ -304,7 +255,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   textInputStyle: {
-    height: 30,
+    height: 40,
     paddingLeft: 35,
     width: widthScreen,
     backgroundColor: color.palette.gray16DP,

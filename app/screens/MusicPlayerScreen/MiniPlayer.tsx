@@ -11,56 +11,51 @@ import {heightDeviceScreen, widthDeviceScreen} from "../../utils/common/definiti
 import {IconAwesome, IconEntypo, IconFeather, 
         IconIonicons, IconMaterial,IconOcticons} from "../../utils/common/definition"
 
-interface Props {
-    name: String,
-    Iconstyles: any,
-    playingState: boolean
+export interface playerInfor {
+    isPlayingState? : boolean,
+    processPlayState?: any,
+    trackInfo?: any
 }
-
-export const MiniPlayer : Component =  observer(function MiniPlayer (props : Props) {
+export const MiniPlayer : Component =  observer(function MiniPlayer (prop : playerInfor) {
 
     const [favoriteColor, setFavoriteColor] = useState(false);
     const [isPlayingState, setPlayingState] = useState(false);
     
     useEffect(()=> {
-        const name = props.name;
-        const playingState = props.playingState;
-        const styles = props.Iconstyles;
-        setPlayingState(playingState)
-        console.log(` name + ${name} + playingState ${playingState}`)
-        return () => {
-            console.log(` Unmounted`)
-        }
-    }, [])
+        const isPlaying = prop.isPlayingState;
+        setPlayingState(isPlaying)
+    })
+
     return (    
         <View style = {styles.container}>
             <View style = {styles.itemContainer}>
                 {/* Favorite Icon */}
                 <View style = {styles.favoriteIcon}>
-                <TouchableOpacity onPress = {() => {
+                {/* <TouchableOpacity onPress = {() => {
                         setFavoriteColor(!favoriteColor)
                         console.log(`favoriteColor +${favoriteColor}`)
                       }}> 
                       <IconAwesome name = {"heart"} size = {30} color = {favoriteColor ? color.palette.orange : color.palette.offWhite} />
-                    </TouchableOpacity>
+                </TouchableOpacity> */}
+                <View style = {{width:  50 , height : 50,  borderRadius: 25, backgroundColor: color.palette.offWhite }}>
+                    <Image style = {{flex: 1, resizeMode: 'cover', borderRadius: 25}}
+                    source = {{uri: prop.trackInfo["urlImage"]}}>
+                    </Image>
+                </View>
                 </View>
                 {/* Content */}
                 <View style = {styles.textContent}>
                     {/*  Song */}
                       <Text style = {[styles.textStyle, {fontWeight: '900', marginBottom: 2}]}>
-                            Love you like you do
+                            {prop.trackInfo["title"]}
                       </Text>
                       {/* Author */}
                       <Text style = {[styles.textStyle, {fontSize: 15, color: color.palette.white70Percent}]}> 
-                            Sharaha
+                           {prop.trackInfo["author"]}
                       </Text>
-
                 </View>
                 <View style = {styles.playerButton}>
-                    <TouchableOpacity onPress = {() => {
-                        setPlayingState(!isPlayingState)
-                        console.log(`On play ${isPlayingState}`)
-                    }}>  
+                    <TouchableOpacity onPress = {prop.processPlayState}>  
                       <IconIonicons name = {isPlayingState ? "play" : "pause"} size = {40} color = {color.palette.offWhite}/>
                     </TouchableOpacity>
                 </View>
@@ -79,7 +74,7 @@ const styles = StyleSheet.create({
     },
     itemContainer: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'row'
     },
     favoriteIcon : {
         flex: 1,

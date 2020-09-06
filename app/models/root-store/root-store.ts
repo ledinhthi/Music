@@ -1,4 +1,6 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { Instance, SnapshotOut, types, SnapshotIn } from "mobx-state-tree"
+import { forEach } from "ramda"
+
 /**
  * A RootStore model.
  */
@@ -8,60 +10,121 @@ export enum State {
 }
 // Define songmodel
 export const SongModel = types.model("Song", {
-    NameSong: types.optional(types.string, ""),
-    NameAuthor: types.optional(types.string, ""),
-    UrlImage: types.optional(types.string, ""),
-    Duration: types.optional(types.number, 0),
-    isPlaying: types.optional(types.boolean, false)
+    title: types.optional(types.string, ""),
+    author: types.optional(types.string, ""),
+    urlImage: types.optional(types.string, ""),
+    thumbnail_medium: types.optional(types.string, ""),
+    duration: types.optional(types.number, 0),
+    urlSong: types.optional(types.string, ""),
+    content: types.optional(types.string, "")
 })
-// Define VideoModel
-export const VideoModel = types.model("Video", {
-    NameVideo: types.optional(types.string, ""),
-    NameAuthor: types.optional(types.string, ""),
-    UrlViddeo: types.optional(types.string, ""),
-    isPlaying: types.optional(types.boolean, false)
-});
+// // Define VideoModel
+// export const VideoModel = types.model("Video", {
+//     NameVideo: types.optional(types.string, ""),
+//     NameAuthor: types.optional(types.string, ""),
+//     UrlViddeo: types.optional(types.string, ""),
+//     isPlaying: types.optional(types.boolean, false)
+// });
 // Define albumSongs
 export const AlbumSongModel = types.model("AlbumSong", {
-    NameAlbumSong: types.optional(types.string, ""),
-    AlbumSong: types.array(SongModel)
+    AlbumArt: types.optional(types.string, ""),
+    AlbumName: types.optional(types.string, ""),
+    Songs: types.array(SongModel)
 })
+.actions(self => ({
+    setAlbumName (albumName) {
+        self.AlbumName = albumName
+    },
+    setListSongs (listSong) {
+        self.Songs = listSong
+    },
+    setAlbumArt(albumArt) {
+        self.AlbumArt = albumArt
+    }
+}))
+.views(self => ({
+     getAlbumName () {
+        return self.AlbumName;
+     },
+     getListSongs () {
+        return self.Songs;
+     }
+}))
 // Define albumVideos
-export const AlbumVideoModel = types.model("AlbumVideo", {
-    NameAlbumVideo: types.optional(types.string, ""),
-    AlbumVideo: types.array(VideoModel)
-})
+// export const AlbumVideoModel = types.model("AlbumVideo", {
+//     NameAlbumVideo: types.optional(types.string, ""),
+//     AlbumVideo: types.array(VideoModel)
+// })
 // Define Playlists
 export const PlaylistsModel = types.model("PlaylistsModel", {
-    AlbumSongPlaylist:  AlbumSongModel,
-    AlbumVideoPlaylist:  AlbumVideoModel
+    AlbumSongPlaylist:  types.array(AlbumSongModel)
 })
-// navigation
-export const PayloadObject = types.model("Payload", {
-    currentScreen: types.optional(types.string, ""),
-    property: types.optional(types.string, ""),
-    valueProperty: types.optional(types.number, 0)
-}).actions(self => ({
-    setValueProp (value) {
-        self.valueProperty = value;
+.views(self => ({
+    getListSongAlbum() {
+        return self.AlbumSongPlaylist
+    },
+    getFirstAlbum() {
+        return self.AlbumSongPlaylist[0]
+    },
+    getAlbumByName(nameAlbum) {
+        var albumTemp = {};
+        if (self.AlbumSongPlaylist.length > 0) {
+            self.AlbumSongPlaylist.forEach(albumn => {
+                if (albumn.AlbumName == nameAlbum) {
+                    albumTemp = albumn
+                    return;
+                }
+            })
+        }
+        return albumTemp;
     }
-})).views(self => ({
-     get getValueProp () {
-        console.log(`self.valueProperty + ${self.valueProperty}`)
-        return self.valueProperty
+}))
+.actions(self => ({
+    setListAlbum(listAlbum) {
+        self.AlbumSongPlaylist = listAlbum
     }
 }))
 
 export const NavigationModel = types.model("NavigationModel", {
-    payload: PayloadObject
+    payload: SongModel,
+    isLogin: types.optional(types.boolean, false)
+}).views(self => {
+    return {
+        getIsLogin() {
+            return self.isLogin
+        },
+        getPayload() {
+            return self.payload
+        },
+    }
+}).actions(self => {
+    return {
+        setIsLogin<T>(key: keyof SnapshotIn<typeof self>, value: T) {
+            (self[key] as T) = value;
+        },
+        setPayload(payload) {
+            self.payload = payload
+        },
+    }
+})
+
+export const DatabaseModel = types.model("DatabaseModel", {
+    firestore: types.frozen()
+}).views(self => {
+    return {
+        get getFireStore() {
+            return self.firestore
+        }
+    }
 })
 // Define Settings
 // export const SettingsModel = 
 
 // prettier-ignore
-export const RootStoreModel = types.model("RootStore").props({
+export const RootStoreModel = types.model("RootStore",{
     Playlist:  PlaylistsModel,
-    Navigation: types.maybe(NavigationModel)
+    Navigation: types.maybe(NavigationModel),
+    Database: types.maybe(DatabaseModel)
 });
 
 /**

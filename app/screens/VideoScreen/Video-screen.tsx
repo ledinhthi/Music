@@ -13,47 +13,18 @@ import IconOcticons from "react-native-vector-icons/Octicons"
 import Swipeout from "react-native-swipeout"
 import { widthDeviceScreen, heightDeviceScreen } from "../../utils/common/definition"
 import YouTube, {YouTubeStandaloneAndroid, YouTubeStandaloneIOS} from "react-native-youtube"
-import { boolean } from "mobx-state-tree/dist/internal"
+import {firebase} from "../../config/firebase"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.black12DP,
 }
-const widthScreen = Dimensions.get("screen").width;
-const heightScreen = Dimensions.get("screen").height;
-
-
-var DATA = [
-  {
-    nameAlbum: "My Songs adasdasdasasdasdaasdasdas",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs1",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs2dasdsadasdsaasdasdsadsa",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs3",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs2",
-    sourceImage: ""
-  },
-  {
-    nameAlbum: "My Songs3",
-    sourceImage: ""
-  }
-]
 const VideoItem = ({item}) => {
   const [videoId, setVideoId] = useState("")
   const [isShowYoutube, setShowYoutube] = useState(false)
-  const url = item.snippet.thumbnails.default.url
-  const VideoId = item.id.videoId
-  console.log(`props.url + ${url}`)
+  const VideoId = item.id.videoId;
+  const title = item.snippet.title;
+  const urlImage = item.snippet.thumbnails.high.url;
+  const description = item.snippet.description;
   return (
     <TouchableOpacity onPress = {() => {
       setVideoId(VideoId)
@@ -62,22 +33,22 @@ const VideoItem = ({item}) => {
     { isShowYoutube === false ? <View style = {styles.videoContainer}>
       <View style = {{flex : 1}}>
         <Image style = {{
-          height: heightDeviceScreen * 15 / 100,zIndex : 10,   width: widthDeviceScreen * 40 /100,  resizeMode: 'cover'}} 
-         source = {{uri: url}}
+          height: heightDeviceScreen * 15 / 100, zIndex : 10,  width: widthDeviceScreen * 45 /100}} 
+          source = {{uri: urlImage}}
         > 
         </Image>
       </View>
       <View style = {styles.titleContainer}>
-        <Text style = {styles.textStyle}
+        <Text style = {[styles.textStyle, {fontWeight: "400"}]}
         numberOfLines = {2}
         ellipsizeMode = "tail"
         >
-              {item.snippet.title}
+              {title}
         </Text>
-        <Text style = {styles.textStyle}
+        <Text style = {[styles.textStyle, {color: color.palette.lightGrey}]}
          numberOfLines = {2}
          ellipsizeMode = "tail">
-              {item.snippet.description}
+              {description}
         </Text>
       </View>
     </View>
@@ -87,13 +58,6 @@ const VideoItem = ({item}) => {
         videoId= {videoId} // The YouTube video ID
         play = {true}
         fullscreen = {true}
-        // play // control playback of video with true/false
-        // fullscreen // control whether the video should play in fullscreen or inline
-        // loop // control whether the video should loop when ended
-        // onReady={}
-        // onChangeState={e => this.setState({ status: e.state })}
-        // onChangeQuality={e => this.setState({ quality: e.quality })}
-        // onError={e => this.setState({ error: e.error })}
         style={{ alignSelf: 'stretch', height: 300 }}
       />
     </View> 
@@ -105,22 +69,20 @@ const VideoItem = ({item}) => {
 export const VideoScreen: Component = observer(function VideoScreen() {
   // Pull in one of our MST stores
   const [youtubeData, setYoutubeData] = useState([]);
+  const [fireStore, setFireStore] = useState();
   const [keySearch, setKeySearch] = useState("")
   const [doneLoading, setDoneLoading] = useState(false)
   const textInputRef = useRef()
-  // const [test, setData] = useState([]);
-  // const []
-  // OR
-  // const rootStore = useStores()
-  
+  // get store
+  const rootStore = useStores()
+
   // Pull in navigation via hook
   // const navigation = useNavigation()
   const fetchYoutubeApi = async () => {
     try {
-        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=songs&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
+        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=songs&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
         const json = await data.json();
         if (json != null) {
-            console.log(`json22 + ${json.items}`)
             setYoutubeData(json.items);
             
         }
@@ -130,15 +92,12 @@ export const VideoScreen: Component = observer(function VideoScreen() {
       Alert.alert("Error Getting Data!!")
     }
   } 
-  // const fetchDataWithPromise = (value) => new Promise((resolve, reject) => {
-  //    fetchYoutubeApiWithKey(value)
-  // });
+ 
   const fetchYoutubeApiWithKey =  async (value) => {
     try {
-        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${value}&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
+        const data = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${value}&type=video&key=AIzaSyASjZ1jqf_RLPnssm1Ot_3SshfdqC2zNHU`)
         const json = await data.json();
         if (json != null) {
-            console.log(`json22 + ${json.items}`)
             setYoutubeData(json.items);
             setDoneLoading(false)      
         }
@@ -149,10 +108,10 @@ export const VideoScreen: Component = observer(function VideoScreen() {
     }
   } 
   useEffect(() => {
-      fetchYoutubeApi();
-  }, [])
+    fetchYoutubeApi()
+  }, [fireStore])
   useEffect(() => {
-    console.log(`Re-render`)
+    
   })
   
   const onChangeText = (text) => {
@@ -161,7 +120,7 @@ export const VideoScreen: Component = observer(function VideoScreen() {
   }
   const onSubmit = () => {
     console.log(`keySearch + ${keySearch}`)
-    textInputRef.current.clear()
+    // textInputRef.current.clear()
     setDoneLoading(true)
     fetchYoutubeApiWithKey(keySearch)
   }
@@ -178,7 +137,6 @@ export const VideoScreen: Component = observer(function VideoScreen() {
           <ActivityIndicator style = 
           {{flex: 1, ...StyleSheet.absoluteFillObject}}
           size = {"large"}
-          
           />
         </Modal>
        </View>
@@ -200,11 +158,10 @@ export const VideoScreen: Component = observer(function VideoScreen() {
             </IconOcticons>
             <TextInput ref = {textInputRef}
             inlineImageLeft='search_icon' style = {styles.textInputStyle}
-             placeholder = {"Search Here!!"}
+             placeholder = {" Tìm kiếm "}
              placeholderTextColor = {color.palette.white70Percent}
              onChangeText = {onChangeText}
              onSubmitEditing = {onSubmit}
-
              >                  
             </TextInput>
        </View>  
@@ -212,7 +169,6 @@ export const VideoScreen: Component = observer(function VideoScreen() {
           <FlatList 
             showsHorizontalScrollIndicator = {false}
             style = {styles.content}
-            // bounces = {true}
             data = {youtubeData}
             horizontal = {false}
             renderItem = {({item}) => (
@@ -230,22 +186,22 @@ export const VideoScreen: Component = observer(function VideoScreen() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      margin: 10
+      marginLeft: 10
     },
     videoContainer: {
-      width: widthDeviceScreen,
+      flex: 1,
+      // backgroundColor: 'white',
       height: heightDeviceScreen * 15 / 100,
       flexDirection :'row',
-      marginVertical: 1
+      justifyContent: 'flex-start'
     },
- 
     titleContainer: {
       flex: 1,
       flexDirection: 'column',
       justifyContent: 'center'
     },
     textInputStyle: {
-      height: 30,
+      height: 40,
       width: widthDeviceScreen,
       paddingLeft: 35,
       marginLeft: 20,
@@ -269,7 +225,6 @@ const styles = StyleSheet.create({
     justifyContent : 'center'
   },
   content : {
-    flex : 0.9,
-    // marginTop: 10
+    flex : 1
   },
 })

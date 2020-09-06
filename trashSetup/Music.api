@@ -1,0 +1,13 @@
+"id": 103,
+                    "name": "Pharrell Williams",
+                    "link": "https://www.deezer.com/artist/103",
+                    "share": "https://www.deezer.com/artist/103?utm_source=deezer&utm_content=artist-103&utm_term=0_1597940776&utm_medium=web",
+                    "picture": "https://api.deezer.com/artist/103/image",
+                    "picture_small": "https://cdns-images.dzcdn.net/images/artist/67f517c99b8b6ca8d9bde94db363b887/56x56-000000-80-0-0.jpg",
+                    "picture_medium": "https://cdns-images.dzcdn.net/images/artist/67f517c99b8b6ca8d9bde94db363b887/250x250-000000-80-0-0.jpg",
+                    "picture_big": "https://cdns-images.dzcdn.net/images/artist/67f517c99b8b6ca8d9bde94db363b887/500x500-000000-80-0-0.jpg",
+                    "picture_xl": "https://cdns-images.dzcdn.net/images/artist/67f517c99b8b6ca8d9bde94db363b887/1000x1000-000000-80-0-0.jpg",
+                    "radio": true,
+                    "tracklist": "https://api.deezer.com/artist/103/top?limit=50",
+                    "type": "artist",
+                    "role": "Featured"

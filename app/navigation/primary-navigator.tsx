@@ -6,7 +6,7 @@
  */
 import React from "react"
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs"
-import { createNativeStackNavigator } from "react-native-screens/native-stack"
+import { createStackNavigator, CardStyleInterpolators  } from "@react-navigation/stack"
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import {PortablePlayerScreen, SettingsScreen, MusicScreen,
        MusicPlayerScreen, PlaylistScreen, VideoScreen, VideoPlayerScreen,
@@ -20,7 +20,7 @@ import IconEntypo from 'react-native-vector-icons/Entypo'
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons'
 import {color} from "../theme"
 import { NavigationContainer } from "@react-navigation/native"
-import {Platform, Text} from 'react-native'
+import {Platform, Text, Easing} from 'react-native'
 
 // settings  inicon   md-settings-sharp 
 
@@ -78,34 +78,34 @@ export type VideoParamList = {
 }
 // Create Stack for all screens 
 const DrawerStack = createDrawerNavigator<PrimaryParamList>();
-const MusicStack  = createNativeStackNavigator<MusicParamList>();
+const MusicStack  = createStackNavigator<MusicParamList>();
 const PlaylistsStack = createMaterialTopTabNavigator<PlaylistsParamList>();
-const AlbumSongStack  = createNativeStackNavigator<AlbumSongParamList>();
-const AlbumVideoStack = createNativeStackNavigator<AlbumVideoParamList>();
-const VideoStack  = createNativeStackNavigator<VideoParamList>();
-const ContainerPlayerStack = createNativeStackNavigator();
+const AlbumSongStack  = createStackNavigator<AlbumSongParamList>();
+const AlbumVideoStack = createStackNavigator<AlbumVideoParamList>();
+const VideoStack  = createStackNavigator<VideoParamList>();
+const ContainerPlayerStack = createStackNavigator();
 
 export function Player(props) {
 //  const lastPosition : React.n = props.lastPosition;
   const lastPosition = props.lastPosition
-  console.log(`props + ${lastPosition}`)
+ 
   return (
       <NavigationContainer>
       <ContainerPlayerStack.Navigator
        screenOptions = {{
-        headerShown : false,
-        stackPresentation: 'modal',
+        headerShown : false,  
+        cardStyle : {
+          backgroundColor: 'transparent'
+        }
       }}
-
+      
     >
       <ContainerPlayerStack.Screen 
       name= "player">
        {props =>  { 
          const test = {
            lastPosition: lastPosition
-        
          }
-         console.log(`lastPosition on stack screen  + ${lastPosition}`)
          return (
             <MusicPlayerScreen {...test}>
             </MusicPlayerScreen>
@@ -146,16 +146,44 @@ function AlbumVideo () {
   )
 }
 
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+const closeConfig = {
+  animation: 'timing',
+  config: {
+    duration: 500,
+    easing: Easing.linear
+  }
+}
 // Music Stack
 function Music () {
   return (
      <MusicStack.Navigator
       screenOptions = {{
-        headerShown : false
+        headerShown : false,
+        gestureEnabled: true,
+        gestureDirection: "horizontal",
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        cardStyle: {
+          backgroundColor: 'transparent'
+        }
       }}
+      mode = "modal"
+      headerMode = "float"
+      initialRouteName = "Music"
      >
        <MusicStack.Screen 
-       name = "Music" component = {MusicScreen} />
+       name = "Music" component = {MusicScreen}
+      />
        <MusicStack.Screen name = "SongPlaylist" component = {SongPlaylistScreen} />
      </MusicStack.Navigator>
   )
@@ -228,8 +256,10 @@ export function PrimaryNavigator() {
         screenOptions={{
          gestureEnabled: true,
          swipeEnabled: true,
+        
           // header : {{visible: false}}
       }}
+    
       drawerContentOptions = {{
         style: {
           flex: 1,
@@ -258,7 +288,6 @@ export function PrimaryNavigator() {
         {
           title: "Playlists",
           drawerIcon: ({focused, size}) => {
-            console.log(`focused + ${focused}`)
             return (
             <IconMaterial name = "playlist-music" size = {25} color =  {focused ? "#00BFFF" : "#808080"}/>
             )
