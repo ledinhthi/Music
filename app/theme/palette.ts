@@ -1,7 +1,6 @@
 export const palette = {
   transparent: "transparent",
   black: "#1d1d1d",
-  
   white: "#ffffff10",
   white40Percent: "#ffffff40",
   white70Percent: "#ffffff70",
