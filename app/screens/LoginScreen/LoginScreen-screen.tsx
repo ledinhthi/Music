@@ -41,8 +41,6 @@ export const LoginScreen: Component = observer(function LoginScreen() {
   // Pull in navigation via hook
   // const navigation = useNavigation()
   // NetInfo
-  
-  
   const subScribe = () =>  {
     NetInfo.addEventListener(state => {
     console.log("Connection type", state.type);

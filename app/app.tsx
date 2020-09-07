@@ -58,7 +58,7 @@ const App: Component<{}> = observer(() => {
 
  const customHeight = Platform.select({
   ios:  heightDeviceScreen - 70,
-  android: heightDeviceScreen - 60 - 48
+  android: heightDeviceScreen - 42 - 48
  })
     ;
   // Use panresponder for Player screen

@@ -69,7 +69,8 @@ export const MiniPlayer : Component =  observer(function MiniPlayer (prop : play
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        borderRadius: 20,     
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,   
         backgroundColor: color.palette.gray16DP
     },
     itemContainer: {

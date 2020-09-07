@@ -185,7 +185,7 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
       const trackInfoTemp = data.payload
       console.log("data.payload", data.payload, "trackInfo title", trackInfo["title"], "trackInfoTemp.title", trackInfoTemp.title)
       if (trackInfo["title"] != trackInfoTemp.title) {
-        storage.save("LastPlayedSong", trackInfoTemp).then((res) => {
+         storage.save("LastPlayedSong", trackInfoTemp).then((res) => {
           console.log("Done save To Async")
         }).catch((error) => {
           console.log("Error save To Async")
@@ -204,8 +204,10 @@ export const MusicPlayerScreen: Component = observer(function MusicPlayerScreen(
     // getCurrentSong
     storage.load("LastPlayedSong").then((lastSong) => {
       console.log("lastsong", lastSong)
-      setTrackInfo(lastSong)
-      setSongToTrackPlayer(lastSong)
+      if (lastSong != null) {
+        setTrackInfo(lastSong)
+        setSongToTrackPlayer(lastSong)
+    }
     }).catch((error) => {
       console.log("error", error)
     })
